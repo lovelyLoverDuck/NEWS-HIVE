@@ -3,12 +3,38 @@ import { useState } from 'react';
 
 function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate('/results', { state: { query: searchQuery } });
+    if (!searchQuery.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5001/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        navigate('/results', { state: { 
+          query: searchQuery,
+          results: data.results 
+        }});
+      } else {
+        alert('검색 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 연결 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -22,12 +48,14 @@ function SearchPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="검색어를 입력하세요"
           className="border p-2 rounded w-full max-w-md"
+          disabled={isLoading}
         />
         <button 
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+          disabled={isLoading}
         >
-          검색하기
+          {isLoading ? '검색 중...' : '검색하기'}
         </button>
       </form>
     </div>
