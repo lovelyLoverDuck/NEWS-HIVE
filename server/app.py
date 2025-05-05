@@ -35,6 +35,24 @@ def search():
         print(f"❌ 처리 실패: {e}")
         return jsonify({'error': str(e)}), 500
 
+# === 키워드 추출 엔드포인트 추가 ===
+from gpt_processor import extract_keywords
+
+@app.route('/keywords', methods=['POST'])
+@cross_origin()
+def keywords():
+    try:
+        data = request.get_json()
+        articles = data.get('articles', [])
+        if not articles or not isinstance(articles, list):
+            return jsonify({'error': '뉴스 기사 리스트가 필요합니다.'}), 400
+        keywords = extract_keywords(articles)
+        return jsonify({'keywords': keywords})
+    except Exception as e:
+        print(f"❌ 키워드 추출 실패: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 
 if __name__ == '__main__':

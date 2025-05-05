@@ -12,6 +12,7 @@ def process_news(query_list, is_initial=True, max_results=500):
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.cluster import DBSCAN
     from config import NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
+    from redis_manager import RedisManager
 
     if isinstance(query_list, str):
         # 기존 단일 query 입력도 허용
@@ -21,7 +22,26 @@ def process_news(query_list, is_initial=True, max_results=500):
     sort = "sim"
     max_results = 500  # 가져올 뉴스의 수
 
-    # ------ 네이버 뉴스 수집 ------
+    # ====== Redis 캐시 체크 (키워드 조합) ======
+    redis_mgr = RedisManager()
+    search_key = "keyword:" + query
+    cached_links = redis_mgr.conn.smembers(search_key)
+    articles_from_cache = []
+    if cached_links:
+        print(f"🟢 Redis HIT: {search_key}, 기사 {len(cached_links)}건")
+        for link in cached_links:
+            article = redis_mgr.conn.hgetall(f"news:{link}")
+            if article:
+                articles_from_cache.append(article)
+        if articles_from_cache:
+            # 캐시된 기사 목록 반환
+            return {"articles": articles_from_cache, "keywords": []}
+        else:
+            print(f"⚠️ 링크는 있으나 기사 본문 없음 (news:{{link}})")
+    else:
+        print(f"🔴 Redis MISS: {search_key}")
+
+    # ------ 네이버 뉴스 수집 (캐시 miss 시에만) ------
     encText = urllib.parse.quote(query)
     all_results = []
 
