@@ -1,4 +1,4 @@
-def process_news(query, max_results=500):
+def process_news(query_list, is_initial=True, max_results=500):
     import numpy as np
     import pandas as pd
     import html
@@ -13,7 +13,10 @@ def process_news(query, max_results=500):
     from sklearn.cluster import DBSCAN
     from config import NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
 
-    query = query
+    if isinstance(query_list, str):
+        # 기존 단일 query 입력도 허용
+        query_list = [query_list]
+    query = " ".join(query_list)
     display = 100
     sort = "sim"
     max_results = 500  # 가져올 뉴스의 수
@@ -156,7 +159,39 @@ def process_news(query, max_results=500):
     for i, title in enumerate(deduplicated_df['title'], start=1):
         print(f"{i}. {title}")
 
-    # GPT로 키워드 추출하기 위해 생성
-    go_GPT = '\n'.join(deduplicated_df['processed_text'].tolist())
 
-    return deduplicated_df.to_dict(orient='records')  # JSON 직렬화 가능 형태로 반환
+    from gpt_processor import extract_keywords
+    from redis_manager import RedisManager
+
+    result = {
+        "articles": deduplicated_df.to_dict(orient='records'),
+        "keywords": []
+    }
+
+    if is_initial:
+        try:
+            raw_keywords = extract_keywords(deduplicated_df.to_dict('records'))
+            # 🔥 핵심 수정: GPT 응답 형식 검증
+            if isinstance(raw_keywords, list) and all(isinstance(kw, str) for kw in raw_keywords):
+                keywords = raw_keywords
+                print(f"🔍 유효 키워드: {keywords}")
+            else:
+                print(f"⚠️ 잘못된 키워드 형식: {type(raw_keywords)}")
+                keywords = []
+            result["keywords"] = keywords
+
+            # Redis 저장 로직 (최초 검색어 조합에만 저장)
+            redis_mgr = RedisManager()
+            news_links = deduplicated_df['originallink'].tolist()
+            valid_links = [link for link in news_links if isinstance(link, str) and link.startswith('http')]
+            print(f"🔗 유효 링크: {len(valid_links)}/{len(news_links)}")
+            search_key = " ".join(query_list)
+            redis_mgr.save_keywords([search_key], valid_links)
+            print(f"✅ {len(valid_links)}개 링크 저장 완료")
+            articles = deduplicated_df.to_dict('records')
+            redis_mgr.save_news_articles(articles)
+            print(f"✅ {len(articles)}개 뉴스 기사 전체 저장 완료")
+        except Exception as e:
+            print(f"❌ 저장 실패: {str(e)}")
+    # 파생/조합 검색 시에는 기사만 반환, 키워드 추출X, 저장X
+    return result
