@@ -1,0 +1,43 @@
+1. client 
+node_modules 삭제 후 npm i, npm run dev
+
+2. server
+python -m venv venv 
+venv\Scripts\activate
+
+pip install flask
+pip install flask-cors
+pip install requests
+pip install openai
+pip install redis
+pip install soynlp
+pip install pandas
+pip install numpy
+
+python app.py
+
+3. config.py
+NAVER_CLIENT_ID = ""
+NAVER_CLIENT_SECRET = "
+OPENAI_API_KEY = ""
+
+REDIS_HOST="127.0.0.1"
+REDIS_PORT=6379
+REDIS_DB=0
+
+4. 참고사항
+
+이미 검색했던 키워드로 처음부터 재검색할 경우(redis hit), 키워드 호출 x 되어서 서치 페이지에서 예시1, 예시2, 예시3으로 출력
+-> 임시로 python clean_redis.py를 실행, 캐시 삭제
+
+현재 db에는 키워드, 뉴스 기사만 저장, gpt요약은 일단 프론트에서 state로 저장되어 finalpage에만 출력
+
+키워드들을 선택하여 확정 버튼을 누르면, 다음 키워드를 생성함과 동시에 gpt요약을 화면 하단에 출력
+단계별 키워드들과 요약은 fianlpage에서 단계별로 출력
+
+ResultsPage.tsx - handleConfirmKeywords() : 요약 요청 추가
+app.py - /summary 엔드포인트
+gpt_processor.py - summarize_articles() : gpt 요약 생성
+
+
+
