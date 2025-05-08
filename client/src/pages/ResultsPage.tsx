@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+//import HexKeywordGrid from './HexKeywordGrid'; 
+
+
 
 function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  //요약저장
+  const [summary, setSummary] = useState<string>(''); // GPT 요약문
+  const [summaryHistory, setSummaryHistory] = useState<{ keywords: string[], summary: string }[]>([]);
+
 
   // location.state가 없으면 홈으로 리디렉트
   React.useEffect(() => {
@@ -27,7 +35,7 @@ function ResultsPage() {
   React.useEffect(() => {
     setResultKeywords(safeKeywords.length > 0 ? safeKeywords : ['예시1', '예시2', '예시3']);
   }, [safeKeywords]);
-  
+
 
   // 토글 버튼 클릭
   const handleToggle = (kw: string) => {
@@ -66,97 +74,140 @@ function ResultsPage() {
     setLoading(false);
   };
 
-  // 키워드 확정(추출) 버튼 (최초 검색이 아닐 때만)
-  // 키워드 확정(추출) 버튼: 현재 resultArticles(뉴스 기사)에 대해 키워드 추출
+  //추가2
   const handleConfirmKeywords = async () => {
+    if (selectedKeywords.length === 0) return;
     setLoading(true);
     try {
-      const resp = await fetch('http://localhost:5001/keywords', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ articles: resultArticles })
-      });
-      const data = await resp.json();
-      setResultKeywords(prev => Array.from(new Set([...(prev || []), ...(data.keywords || [])])));
-      // 기사 목록(resultArticles)는 그대로 유지
+      // 키워드 추출 요청
+      const [keywordsResp, summaryResp] = await Promise.all([
+        fetch('http://localhost:5001/keywords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ articles: resultArticles })
+        }),
+        fetch('http://localhost:5001/summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ articles: resultArticles })
+        })
+      ]);
+
+      const keywordsData = await keywordsResp.json();
+      const summaryData = await summaryResp.json();
+
+      // 키워드 갱신
+      if (keywordsData.keywords) {
+        setResultKeywords(prev => Array.from(new Set([...(prev || []), ...(keywordsData.keywords || [])])));
+      }
+
+      // 요약 저장
+      if (summaryData.summary) {
+        setSummary(summaryData.summary);
+        setSummaryHistory(prev => [...prev, { keywords: [...selectedKeywords], summary: summaryData.summary }]);
+      }
+
     } catch (e: any) {
-      alert('키워드 추출 실패: ' + (e?.message || e));
-      console.error('키워드 추출 실패', e);
+      alert('키워드 또는 요약 처리 실패');
+      console.error(e);
     }
     setLoading(false);
   };
 
+
   return (
-    <div style={{ padding: 20 }}>
-      <h2>검색 결과</h2>
-      <div>
-        <b>키워드 버튼 (최대 3개): </b>
-        {resultKeywords.map((kw: string) => (
-          <button
-            key={kw}
-            style={{
-              margin: 4,
-              background: selectedKeywords.includes(kw) ? '#007bff' : '#eee',
-              color: selectedKeywords.includes(kw) ? 'white' : 'black',
-              border: '1px solid #ccc',
-              borderRadius: 4,
-              padding: '4px 10px',
-              cursor: 'pointer'
-            }}
-            onClick={() => handleToggle(kw)}
-          >
-            {kw}
-          </button>
-        ))}
-      </div>
-      <div style={{ margin: '10px 0' }}>
-        <button onClick={() => reSearch()} disabled={selectedKeywords.length === 0 || loading}>
-          선택 키워드로 재검색
-        </button>
+    <div className="h-screen flex flex-col">
+      {/* 상단 버튼 영역 */}
+      <div className="h-[60px] px-4 py-2 flex gap-2 border-b border-gray-300">
         <button
           onClick={handleConfirmKeywords}
           disabled={selectedKeywords.length === 0 || loading}
-          style={{
-            marginLeft: 8,
-            background: '#007bff',
-            color: 'white',
-            border: '2px solid #0056b3',
-            borderRadius: 6,
-            fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-            padding: '8px 18px',
-            cursor: selectedKeywords.length === 0 || loading ? 'not-allowed' : 'pointer',
-            transition: 'background 0.2s, border 0.2s',
-            outline: 'none',
-          }}
-          onMouseOver={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#0056b3';
-            (e.currentTarget as HTMLButtonElement).style.border = '2px solid #003d80';
-          }}
-          onMouseOut={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#007bff';
-            (e.currentTarget as HTMLButtonElement).style.border = '2px solid #0056b3';
-          }}
+          className={`px-4 py-2 rounded font-semibold transition ${selectedKeywords.length === 0 || loading
+              ? 'bg-blue-300 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
         >
           키워드 확정(추출)
         </button>
+        <button
+          onClick={() => navigate('/final', { state: { summaryHistory } })}
+          disabled={summaryHistory.length === 0}
+          className={`px-4 py-2 rounded font-semibold transition ${summaryHistory.length === 0
+              ? 'bg-green-300 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+        >
+          완료
+        </button>
+        <Link to="/" className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+          처음으로
+        </Link>
       </div>
-      <div>
-        <b>뉴스 기사 수: {resultArticles.length}</b>
-        <ul>
-          {resultArticles.map((item, idx) => (
-            <li key={idx} style={{ border: '1px solid #ddd', margin: 8, padding: 8 }}>
-              <b>{item.title}</b>
-              <div>{item.description}</div>
-              <div>원문: <a href={item.originallink} target="_blank" rel="noopener noreferrer">{item.originallink}</a></div>
-              <div>발행일: {item.pubDate}</div>
-            </li>
-          ))}
-        </ul>
+
+      {/* 중간 콘텐츠 (키워드 버튼 + 기사 리스트) */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* 좌측: 키워드 버튼 */}
+        <div className="w-2/3 p-4 border-r border-gray-300 overflow-auto">
+          {/* 임시 육각형 테스트
+          <HexKeywordGrid
+            keywords={resultKeywords}
+            selected={selectedKeywords}
+            onToggle={handleToggle}
+          /> */}
+          <div className="flex flex-wrap gap-2">
+            {resultKeywords.map((kw) => (
+              <button
+                key={kw}
+                onClick={() => handleToggle(kw)}
+                className={`px-3 py-1 rounded border text-sm transition ${selectedKeywords.includes(kw)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300 text-black'
+                  }`}
+              >
+                {kw}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* 우측: 뉴스 기사 */}
+        <div className="w-1/3 p-4 overflow-auto">
+          <h2 className="text-xl font-bold mb-2">📰 뉴스 기사 수: {resultArticles.length}</h2>
+          <ul className="space-y-4">
+            {resultArticles.map((item, idx) => (
+              <li key={idx} className="border border-gray-300 p-3 rounded">
+                <h3 className="font-semibold mb-1">{item.title}</h3>
+                <p className="text-sm text-gray-700 mb-1">{item.description}</p>
+                <p className="text-sm">
+                  <a
+                    href={item.originallink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    원문 보기
+                  </a>
+                  <span className="ml-4 text-gray-500">발행일: {item.pubDate}</span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      {loading && <div>로딩중...</div>}
+
+      {/* 하단: GPT 요약 */}
+      <div className="h-[120px] p-4 border-t border-gray-300 bg-yellow-50 overflow-auto">
+        {summary ? (
+          <>
+            <h3 className="font-semibold text-lg mb-2">📝 GPT 요약</h3>
+            <p className="text-sm whitespace-pre-wrap">{summary}</p>
+          </>
+        ) : (
+          <p className="text-sm text-gray-500">요약 결과가 여기에 표시됩니다.</p>
+        )}
+      </div>
     </div>
   );
+
 }
 
 export default ResultsPage;
