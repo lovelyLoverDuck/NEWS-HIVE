@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from news_processor import process_news
+from gpt_processor import summarize_articles
 
 
 app = Flask(__name__)
@@ -51,6 +52,22 @@ def keywords():
     except Exception as e:
         print(f"❌ 키워드 추출 실패: {e}")
         return jsonify({'error': str(e)}), 500
+    
+#요약
+@app.route('/summary', methods=['POST'])
+@cross_origin()
+def summary():
+    try:
+        data = request.get_json()
+        articles = data.get('articles', [])
+        if not articles or not isinstance(articles, list):
+            return jsonify({'error': '뉴스 기사 리스트가 필요합니다.'}), 400
+
+        summary_text = summarize_articles(articles)
+        return jsonify({'summary': summary_text})
+    except Exception as e:
+        print(f"❌ 요약 API 실패: {e}")
+        return jsonify({'error': str(e)}), 500 
 
 
 

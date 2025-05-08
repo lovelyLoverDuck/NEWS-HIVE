@@ -40,3 +40,26 @@ if __name__ == "__main__":
         print("추출 키워드:", extract_keywords(sample))
     except Exception as e:
         print(e)
+        
+#gpt요약        
+def summarize_articles(news_data):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "다음 뉴스 기사 목록을 요약해줘. 5문장 이내로 전체 흐름을 설명하듯 써줘. 반드시 요약문만 응답해."
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(news_data, ensure_ascii=False)
+                }
+            ]
+        )
+        summary = response.choices[0].message.content.strip()
+        print(f"📝 요약문: {summary}")
+        return summary
+    except Exception as e:
+        print(f"❌ GPT 요약 실패: {e}")
+        return "요약 생성 실패"
