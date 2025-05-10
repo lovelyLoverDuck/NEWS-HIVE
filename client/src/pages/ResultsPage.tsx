@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-//import HexKeywordGrid from './HexKeywordGrid'; 
+import HexKeywordGrid from './HexKeywordGrid';
 
 
 
@@ -44,9 +44,11 @@ function ResultsPage() {
     }
   };
 
+  // 최초 마운트 시에만 safeKeywords로 초기화 (추가 키워드가 덮어써지지 않게)
   React.useEffect(() => {
     setResultKeywords(safeKeywords.length > 0 ? safeKeywords : ['예시1', '예시2', '예시3']);
-  }, [safeKeywords]);
+    // eslint-disable-next-line
+  }, []);
 
 
   // 토글 버튼 클릭
@@ -108,9 +110,10 @@ function ResultsPage() {
       const keywordsData = await keywordsResp.json();
       const summaryData = await summaryResp.json();
 
-      // 키워드 갱신
+      // 키워드 갱신 (한 번에 최대 3개만 추가)
       if (keywordsData.keywords) {
-        setResultKeywords(prev => Array.from(new Set([...(prev || []), ...(keywordsData.keywords || [])])));
+        const newKeywords = (keywordsData.keywords || []).slice(0, 3);
+        setResultKeywords(prev => Array.from(new Set([...(prev || []), ...newKeywords])));
       }
 
       // 요약 저장
@@ -169,6 +172,8 @@ function ResultsPage() {
               onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
               placeholder="키워드 입력"
               className="border px-2 py-1 rounded w-40 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={{ position: 'relative', zIndex: 10 }}
+              autoFocus
               disabled={loading}
             />
             <button
@@ -182,7 +187,13 @@ function ResultsPage() {
               추가
             </button>
           </div>
-          {/* 키워드 버튼 리스트 */}
+          {/* 키워드 버튼 리스트: 육각형 벌집 레이아웃 */}
+          <HexKeywordGrid
+            keywords={resultKeywords}
+            selected={selectedKeywords}
+            onToggle={handleToggle}
+          />
+          {/*
           <div className="flex flex-wrap gap-2">
             {resultKeywords.map((kw) => (
               <button
@@ -197,6 +208,7 @@ function ResultsPage() {
               </button>
             ))}
           </div>
+          */}
         </div>
         {/* 우측: 뉴스 기사 */}
         <div className="w-1/3 p-4 overflow-auto">

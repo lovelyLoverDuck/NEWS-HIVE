@@ -21,16 +21,16 @@ const generateHexCoords = (radius: number) => {
   return coords;
 };
 
-const sortCoordsByDistance = (coords: { q: number; r: number; s: number }[]) => {
-  return coords.sort((a, b) => {
+// sortCoordsByDistance 제거: 좌표 순서를 그대로 사용하여 키워드 위치가 고정되도록 함
+
+const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
+  // 모든 키워드를 중앙부터 가까운 순서로 배치
+  const displayKeywords = keywords;
+  const coords = generateHexCoords(3).sort((a, b) => {
     const da = Math.abs(a.q) + Math.abs(a.r) + Math.abs(a.s);
     const db = Math.abs(b.q) + Math.abs(b.r) + Math.abs(b.s);
     return da - db;
   });
-};
-
-const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
-  const coords = sortCoordsByDistance(generateHexCoords(3)); // 반지름 3 = 최대 37개 셀
 
   return (
     <div
@@ -50,10 +50,9 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
           spacing={1.1}
           origin={{ x: 0, y: 0 }}
         >
-          {coords.map(({ q, r, s }, i) => {
-            const kw = keywords[i];
+          {coords.slice(0, displayKeywords.length).map(({ q, r, s }, i) => {
+            const kw = displayKeywords[i];
             const isSelected = kw && selected.includes(kw);
-
             return (
               <Hexagon
                 key={`${q},${r},${s}`}
@@ -74,12 +73,17 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                     dy=".35em"
                     fontSize={kw.length >= 5 ? 3.5 : 5.5}
                     textAnchor="middle"
+                    dominantBaseline="middle"
+                    alignmentBaseline="middle"
+                    fontFamily="system-ui"
+                    fontStyle="normal"
+                    fontStretch="normal"
+                    letterSpacing="0.03em"
+                    paintOrder="stroke fill markers"
                     style={{
-                        fill: 'black',
-                        userSelect: 'none',
-                        fontWeight: 100,
-                        fontFamily: 'Arial, sans-serif',          
-                        shapeRendering: 'geometricPrecision',
+                      fill: 'black',
+                      userSelect: 'none',
+                      shapeRendering: 'geometricPrecision',
                     }}
                   >
                     {kw}

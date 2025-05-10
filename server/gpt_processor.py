@@ -27,7 +27,8 @@ def extract_keywords(news_data):
         # JSON 파싱 전처리
         cleaned = raw_response.replace("'", '"').strip('` \n') 
         result = json.loads(cleaned)
-        return result.get('keywords', [])
+        # 최대 3개까지만 반환
+        return result.get('keywords', [])[:3]
         
     except json.JSONDecodeError as e:
         print(f"🚨 JSON 파싱 실패: {e}\n원본: {raw_response}")

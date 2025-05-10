@@ -193,10 +193,17 @@ def process_news(query_list, is_initial=True, max_results=500):
     if is_initial:
         try:
             raw_keywords = extract_keywords(deduplicated_df.to_dict('records'))
-            # 🔥 핵심 수정: GPT 응답 형식 검증
+            # 🔥 핵심 수정: 항상 검색어(query) 자체를 첫 번째 키워드로 포함, 최대 3개 제한
             if isinstance(raw_keywords, list) and all(isinstance(kw, str) for kw in raw_keywords):
-                keywords = raw_keywords
-                print(f"🔍 유효 키워드: {keywords}")
+                # 검색어(조합일 경우 전체 문자열) 포함
+                base_query = " ".join(query_list).strip()
+                keywords = [base_query] if base_query and base_query not in raw_keywords else []
+                for kw in raw_keywords:
+                    if kw != base_query:
+                        keywords.append(kw)
+                    if len(keywords) >= 3:
+                        break
+                print(f"🔍 유효 키워드(검색어 포함, 3개 제한): {keywords}")
             else:
                 print(f"⚠️ 잘못된 키워드 형식: {type(raw_keywords)}")
                 keywords = []
