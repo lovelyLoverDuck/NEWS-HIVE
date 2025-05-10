@@ -175,6 +175,24 @@ function ResultsPage() {
 
         {/* 우측 기사/요약 영역 */}
         <div className="w-1/3 p-4 overflow-auto">
+          {/* 로딩 바 */}
+          {loading && (
+            <div style={{ width: '100%', height: 4, background: '#eee', borderRadius: 2, overflow: 'hidden', marginBottom: 12 }}>
+              <div style={{
+                width: '40%',
+                height: '100%',
+                background: '#ffce00',
+                borderRadius: 2,
+                animation: 'loading-bar-move 1s linear infinite'
+              }} />
+              <style>{`
+                @keyframes loading-bar-move {
+                  0% { margin-left: -40%; }
+                  100% { margin-left: 100%; }
+                }
+              `}</style>
+            </div>
+          )}
           <div className="mb-4 rounded p-3" style={{ backgroundColor: '#F7DA21', color: '#121212' }}>
             {summary ? (
               <>
