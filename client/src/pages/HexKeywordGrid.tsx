@@ -7,6 +7,7 @@ interface Props {
   onToggle: (kw: string) => void;
 }
 
+// 육각형 좌표 생성기
 const generateHexCoords = (radius: number) => {
   const coords = [];
   for (let q = -radius; q <= radius; q++) {
@@ -20,13 +21,14 @@ const generateHexCoords = (radius: number) => {
   return coords;
 };
 
+// 중심과 가까운 순서로 정렬
+const distanceFromCenter = (hex: { q: number; r: number; s: number }) =>
+  Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(hex.s));
+
 const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
-  const displayKeywords = keywords;
-  const coords = generateHexCoords(3).sort((a, b) => {
-    const da = Math.abs(a.q) + Math.abs(a.r) + Math.abs(a.s);
-    const db = Math.abs(b.q) + Math.abs(b.r) + Math.abs(b.s);
-    return da - db;
-  });
+  // 키워드 수에 따라 동적으로 반지름 설정
+  const radius = Math.ceil(Math.sqrt(keywords.length));
+  const coords = generateHexCoords(radius).sort((a, b) => distanceFromCenter(a) - distanceFromCenter(b));
 
   return (
     <div
@@ -46,8 +48,8 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
           spacing={1.1}
           origin={{ x: 0, y: 0 }}
         >
-          {coords.slice(0, displayKeywords.length).map(({ q, r, s }, i) => {
-            const kw = displayKeywords[i];
+          {coords.slice(0, keywords.length).map(({ q, r, s }, i) => {
+            const kw = keywords[i];
             const isSelected = kw && selected.includes(kw);
             return (
               <Hexagon
@@ -58,7 +60,7 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                 onClick={() => kw && onToggle(kw)}
                 style={{
                   fill: isSelected ? '#F7DA21' : '#E5E7EB',
-                  stroke: 'none',
+                  stroke: 'none', // 테두리 제거
                   cursor: kw ? 'pointer' : 'default',
                 }}
               >
@@ -69,13 +71,10 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                     dy=".35em"
                     fontSize={kw.length >= 5 ? 3.5 : 5.5}
                     textAnchor="middle"
-                    dominantBaseline="middle"
-                    alignmentBaseline="middle"
-                    fontFamily="system-ui"
-                    letterSpacing="0.03em"
                     style={{
                       fill: '#121212',
                       userSelect: 'none',
+                      fontFamily: 'Arial, sans-serif',
                       shapeRendering: 'geometricPrecision',
                     }}
                   >
