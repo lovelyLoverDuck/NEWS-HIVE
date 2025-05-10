@@ -96,27 +96,7 @@ function FinalPage() {
         </div>
       </div>
 
-      {/* 완전 중앙 정렬된 키워드 시각화 */}
-      {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-        <div className="mb-8 w-full flex flex-col items-center justify-center">
-          <div className="flex flex-row items-center justify-center w-full">
-            {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => (
-              <React.Fragment key={idx}>
-                <div
-                  className="flex items-center justify-center rounded-full overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 110, height: 110, background: '#F7DA21', color: '#121212', fontWeight: 600, fontSize: arr.length > 6 ? 22 : 28, maxWidth: 110 }}
-                  title={kw}
-                >
-                  <span className="px-3 w-full text-center block overflow-hidden text-ellipsis whitespace-nowrap" style={{fontSize: arr.length > 8 ? 17 : arr.length > 6 ? 20 : 24}}>{kw}</span>
-                </div>
-                {idx < arr.length - 1 && (
-                  <div className="mx-4" style={{ height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      )}
+    
 
       {/* 최종 보고 영역 */}
       {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
@@ -162,59 +142,60 @@ function FinalPage() {
           {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => (
-                  <React.Fragment key={idx}>
-                    <div
-                      style={{
-                        width: 110,
-                        height: 110,
-                        background: '#F7DA21',
-                        color: '#121212',
-                        fontWeight: 700,
-                        fontSize: 20,
-                        maxWidth: 110,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        margin: 0,
-                        padding: 0,
-                        letterSpacing: '-0.02em',
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      <span
+                {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => {
+                  // 자동 폰트 크기 조정 및 ellipsis 적용
+                  let fontSize = 28;
+                  if (kw.length > 7) fontSize = 17;
+                  else if (kw.length > 5) fontSize = 20;
+                  else if (arr.length > 8) fontSize = 17;
+                  else if (arr.length > 6) fontSize = 20;
+                  return (
+                    <React.Fragment key={idx}>
+                      <div
                         style={{
+                          width: 110,
+                          height: 110,
+                          background: '#F7DA21',
+                          color: '#121212',
+                          fontWeight: 700,
+                          fontSize,
+                          maxWidth: 110,
+                          borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          width: '100%',
-                          height: '100%',
-                          maxWidth: '100%',
-                          minWidth: 0,
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
-                          textAlign: 'center',
-                          fontWeight: 700,
-                          letterSpacing: '0.02em',
-                          fontSize: 20,
-                          lineHeight: '110px',
-                          padding: 0,
-                          paddingBottom: 24
+                          margin: 0,
+                          padding: '0 10px',
+                          letterSpacing: '-0.02em',
+                          lineHeight: 1.2,
                         }}
+                        title={kw}
                       >
-                        {kw.length > 5 ? kw.slice(0, 5) + '...' : kw}
-                      </span>
-                    </div>
-                    {idx < arr.length - 1 && (
-                      <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
-                    )}
-                  </React.Fragment>
-                ))}
+                        <div style={{
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  textAlign: 'center',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  lineHeight: 1,
+  verticalAlign: 'middle',
+  padding: 0,
+  paddingTop: 26
+}}>{kw}</div>
+                      </div>
+                      {idx < arr.length - 1 && (
+                        <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -225,14 +206,13 @@ function FinalPage() {
                 background: '#f9f9f9',
                 border: '2px solid #f7da21',
                 borderRadius: 12,
-                padding: '10px 28px 28px 28px',
-                margin: '8px 0 30px 0',
+                padding: 28,
+                margin: '30px 0',
                 width: '100%',
                 fontSize: 18,
                 fontWeight: 500,
                 whiteSpace: 'pre-line',
                 color: '#222',
-                marginBottom: 8
               }}
             >
               {finalReport}
@@ -263,7 +243,7 @@ function FinalPage() {
           {/* PDF 메모 영역 */}
           <div style={{ marginTop: 32, width: '100%' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 12 }}>📝 나의 메모</h2>
-            <div 
+            <div
               style={{
                 whiteSpace: 'pre-wrap',
                 border: '1px solid #E7E7E7',
@@ -279,23 +259,6 @@ function FinalPage() {
         </div>
       </div>
 
-      {/* 실제 요약 내용 */}
-      {typedSummaryHistory.length === 0 ? (
-        <p>요약된 정보가 없습니다.</p>
-      ) : (
-        <ul className="space-y-6">
-          {typedSummaryHistory.map((item, index) => (
-            <li
-              key={index}
-              className="rounded p-4"
-              style={{ backgroundColor: '#FAFAFA', border: '1px solid #E7E7E7' }}
-            >
-              <p className="text-sm text-[#666]">🔑 키워드: {item.keywords.join(', ')}</p>
-              <p className="mt-2">{item.summary}</p>
-            </li>
-          ))}
-        </ul>
-      )}
 
       {/* 메모 영역 */}
       <div className="mt-8">
@@ -340,7 +303,27 @@ function FinalPage() {
           메모 복사하기
         </button>
       </div>
+      <ul className="space-y-6 mt-12"></ul>
+      <ul className="space-y-6 mt-12"></ul>
+      {/* 실제 요약 내용 */}
+      {typedSummaryHistory.length === 0 ? (
+        <p>요약된 정보가 없습니다.</p>
+      ) : (
+        <ul className="space-y-6">
+          {typedSummaryHistory.map((item, index) => (
+            <li
+              key={index}
+              className="rounded p-4"
+              style={{ backgroundColor: '#FAFAFA', border: '1px solid #E7E7E7' }}
+            >
+              <p className="text-sm text-[#666]">🔑 키워드: {item.keywords.join(', ')}</p>
+              <p className="mt-2">{item.summary}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
+    
   );
 }
 
