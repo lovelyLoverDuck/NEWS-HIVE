@@ -7,7 +7,7 @@ function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [summary, setSummary] = useState<string>(''); // GPT 요약문
+  const [summary, setSummary] = useState<string>('');
   const [summaryHistory, setSummaryHistory] = useState<{ keywords: string[], summary: string }[]>([]);
   const { query_list = [], is_initial = true, articles = [], keywords = [] } = location.state || {};
   const safeArticles = Array.isArray(articles) ? articles : [];
@@ -107,35 +107,26 @@ function ResultsPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* 상단 버튼 영역 */}
-      <div className="h-[60px] px-4 py-2 flex gap-2 items-center border-b border-gray-300">
-        <Link
-          to="/"
-          className="bg-gray-600 text-white p-2 rounded hover:bg-gray-700"
-          title="처음으로"
-        >
-          <FaHome size={20} />
-        </Link>
-
-        <button
-          onClick={handleConfirmKeywords}
-          disabled={selectedKeywords.length === 0 || loading}
-          className={`px-4 py-2 rounded font-semibold transition ${selectedKeywords.length === 0 || loading
-            ? 'bg-blue-300 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-        >
-          키워드 확정(추출)
-        </button>
-
+    <div className="h-screen flex flex-col" style={{ backgroundColor: '#FFFFFF', color: '#121212' }}>
+      {/* ✅ 상단바: 홈 + 완료 버튼 분리 */}
+      <div className="h-[60px] px-4 py-2 flex items-center justify-between border-b" style={{ borderColor: '#E7E7E7' }}>
+        <div className="flex gap-2 items-center">
+          <Link
+            to="/"
+            className="bg-[#121212] text-white p-2 rounded hover:opacity-80"
+            title="처음으로"
+          >
+            <FaHome size={20} />
+          </Link>
+        </div>
         <button
           onClick={() => navigate('/final', { state: { summaryHistory } })}
           disabled={summaryHistory.length === 0}
-          className={`px-4 py-2 rounded font-semibold transition ${summaryHistory.length === 0
-            ? 'bg-green-300 cursor-not-allowed'
-            : 'bg-green-600 hover:bg-green-700 text-white'
-            }`}
+          className={`px-4 py-2 rounded font-semibold transition ${
+            summaryHistory.length === 0
+              ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+              : 'bg-[#F7DA21] text-[#121212] hover:brightness-105'
+          }`}
         >
           완료
         </button>
@@ -144,25 +135,38 @@ function ResultsPage() {
       {/* 중간 콘텐츠 */}
       <div className="flex flex-1 overflow-hidden">
         {/* 좌측 키워드 */}
-        <div className="w-2/3 p-4 border-r border-gray-300 overflow-auto">
+        <div className="w-2/3 p-4 border-r overflow-auto" style={{ borderColor: '#E7E7E7' }}>
           <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={handleConfirmKeywords}
+              disabled={selectedKeywords.length === 0 || loading}
+              className={`px-3 py-1 rounded font-semibold transition ${
+                selectedKeywords.length === 0 || loading
+                  ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                  : 'bg-[#121212] text-white hover:opacity-90'
+              }`}
+            >
+              키워드 확정(추출)
+            </button>
             <input
               type="text"
               value={inputKeyword}
               onChange={e => setInputKeyword(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
               placeholder="키워드 입력"
-              className="border px-2 py-1 rounded w-40 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border px-2 py-1 rounded w-40 focus:outline-none"
+              style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212' }}
               autoFocus
               disabled={loading}
             />
             <button
               onClick={handleAddKeyword}
               disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
-              className={`px-3 py-1 rounded font-semibold transition ${!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
+              className={`px-3 py-1 rounded font-semibold transition ${
+                !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
+                  ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                  : 'bg-[#121212] text-white hover:opacity-90'
+              }`}
             >
               추가
             </button>
@@ -174,26 +178,29 @@ function ResultsPage() {
           />
         </div>
 
-        {/* 우측: GPT 요약 + 뉴스 목록 */}
+        {/* 우측 뉴스 + 요약 */}
         <div className="w-1/3 p-4 overflow-auto">
-          {/* GPT 요약을 우측 상단으로 이동 */}
-          <div className="mb-4 bg-yellow-50 border border-yellow-300 rounded p-3">
+          <div className="mb-4 rounded p-3" style={{ backgroundColor: '#F7DA21', color: '#121212' }}>
             {summary ? (
               <>
                 <h3 className="font-semibold text-lg mb-2">📝 GPT 요약</h3>
                 <p className="text-sm whitespace-pre-wrap">{summary}</p>
               </>
             ) : (
-              <p className="text-sm text-gray-500">요약 결과가 여기에 표시됩니다.</p>
+              <p className="text-sm text-[#666]">요약 결과가 여기에 표시됩니다.</p>
             )}
           </div>
 
           <h2 className="text-xl font-bold mb-2">📰 뉴스 기사 수: {resultArticles.length}</h2>
           <ul className="space-y-4">
             {resultArticles.map((item, idx) => (
-              <li key={idx} className="border border-gray-300 p-3 rounded">
+              <li
+                key={idx}
+                className="p-3 rounded border"
+                style={{ borderColor: '#E7E7E7', backgroundColor: '#FAFAFA', color: '#121212' }}
+              >
                 <h3 className="font-semibold mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-700 mb-1">{item.description}</p>
+                <p className="text-sm mb-1">{item.description}</p>
                 <p className="text-sm">
                   <a
                     href={item.originallink}
@@ -203,7 +210,7 @@ function ResultsPage() {
                   >
                     원문 보기
                   </a>
-                  <span className="ml-4 text-gray-500">발행일: {item.pubDate}</span>
+                  <span className="ml-4 text-[#666]">발행일: {item.pubDate}</span>
                 </p>
               </li>
             ))}
