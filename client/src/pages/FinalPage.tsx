@@ -255,7 +255,7 @@ function FinalPage() {
               className="rounded p-4"
               style={{ backgroundColor: '#FAFAFA', border: '1px solid #E7E7E7' }}
             >
-              <p className="text-sm text-[#666]">🔑 키워드: {item.keywords.join(', ')}</p>
+              <p className="text-sm text-[#666]">🔑 내가 선택한 키워드: {item.keywords.join(', ')}</p>
               <p className="mt-2">{item.summary}</p>
             </li>
           ))}
