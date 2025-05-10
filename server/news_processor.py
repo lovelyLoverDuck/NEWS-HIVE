@@ -1,3 +1,5 @@
+from gpt_processor import extract_keywords
+
 def process_news(query_list, is_initial=True, max_results=500):
     import numpy as np
     import pandas as pd
@@ -34,8 +36,8 @@ def process_news(query_list, is_initial=True, max_results=500):
             if article:
                 articles_from_cache.append(article)
         if articles_from_cache:
-            # 캐시된 기사 목록 반환
-            return {"articles": articles_from_cache, "keywords": []}
+            keywords = extract_keywords(articles_from_cache)
+            return {"articles": articles_from_cache, "keywords": keywords}
         else:
             print(f"⚠️ 링크는 있으나 기사 본문 없음 (news:{{link}})")
     else:
@@ -180,7 +182,7 @@ def process_news(query_list, is_initial=True, max_results=500):
         print(f"{i}. {title}")
 
 
-    from gpt_processor import extract_keywords
+
     from redis_manager import RedisManager
 
     result = {

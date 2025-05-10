@@ -22,7 +22,7 @@ class RedisManager:
         for keyword in keywords:
             key = f"keyword:{keyword.strip()}"
             self.conn.sadd(key, *cleaned_links)
-            self.conn.expire(key, 604800)
+            self.conn.expire(key, 600) # 1시간
 
     def save_news_articles(self, articles):
         """
