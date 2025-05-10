@@ -26,6 +26,7 @@ const distanceFromCenter = (hex: { q: number; r: number; s: number }) =>
   Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(hex.s));
 
 const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
+  const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
   // 키워드 수에 따라 동적으로 반지름 설정
   const radius = Math.ceil(Math.sqrt(keywords.length));
   const coords = generateHexCoords(radius).sort((a, b) => distanceFromCenter(a) - distanceFromCenter(b));
@@ -58,10 +59,13 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                 r={r}
                 s={s}
                 onClick={() => kw && onToggle(kw)}
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
                 style={{
-                  fill: isSelected ? '#F7DA21' : '#E5E7EB',
+                  fill: hoveredIdx === i ? '#ffce00' : isSelected ? '#F7DA21' : '#E5E7EB',
                   stroke: 'none', // 테두리 제거
                   cursor: kw ? 'pointer' : 'default',
+                  transition: 'fill 0.2s',
                 }}
               >
                 {kw && (
