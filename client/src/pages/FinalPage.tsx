@@ -138,67 +138,6 @@ function FinalPage() {
         <div style={{ width: '100%' }}>
           {/* 최종 요약 결과 제목 (항상 최상단) */}
           <h1 style={{ fontSize: '2.7rem', fontWeight: 800, marginBottom: '2.2rem', textAlign: 'center', letterSpacing: '0.02em' }}>최종 요약 결과</h1>
-          {/* 선택한 키워드 시각화 (제목 아래) */}
-          {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => {
-                  // 자동 폰트 크기 조정 및 ellipsis 적용
-                  let fontSize = 28;
-                  if (kw.length > 7) fontSize = 17;
-                  else if (kw.length > 5) fontSize = 20;
-                  else if (arr.length > 8) fontSize = 17;
-                  else if (arr.length > 6) fontSize = 20;
-                  return (
-                    <React.Fragment key={idx}>
-                      <div
-                        style={{
-                          width: 110,
-                          height: 110,
-                          background: '#F7DA21',
-                          color: '#121212',
-                          fontWeight: 700,
-                          fontSize,
-                          maxWidth: 110,
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          margin: 0,
-                          padding: '0 10px',
-                          letterSpacing: '-0.02em',
-                          lineHeight: 1.2,
-                        }}
-                        title={kw}
-                      >
-                        <div style={{
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'center',
-  textAlign: 'center',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  lineHeight: 1,
-  verticalAlign: 'middle',
-  padding: 0,
-  paddingTop: 26
-}}>{kw}</div>
-                      </div>
-                      {idx < arr.length - 1 && (
-                        <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </div>
-          )}
           {/* 최종 보고 PDF에 반드시 포함 - 키워드 아래 */}
           {finalReport && (
             <div
