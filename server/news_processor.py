@@ -21,7 +21,7 @@ def process_news(query_list, is_initial=True, max_results=500):
         query_list = [query_list]
     query = " ".join(query_list)
     display = 100
-    sort = "sim"
+    sort = "date"
     max_results = 500  # 가져올 뉴스의 수
 
     # ====== Redis 캐시 체크 (키워드 조합) ======
