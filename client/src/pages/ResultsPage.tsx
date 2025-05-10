@@ -166,36 +166,35 @@ function ResultsPage() {
               />
             </div>
             {/* 하단: 키워드 생성 버튼 */}
-            <div className="sticky bottom-0 left-0 w-full bg-white pt-2 pb-4 flex justify-center gap-100 shadow-[0_-2px_8px_rgba(0,0,0,0.04)] z-10">
+            <div className="sticky bottom-0 left-0 w-full bg-white pt-2 pb-4 flex items-center shadow-[0_-2px_8px_rgba(0,0,0,0.04)] z-10 relative">
+              <div className="flex-1 flex justify-end pr-4">
+                {/* 오른쪽 끝: 탐색 종료 */}
+                <button
+                  onClick={() => navigate('/final', { state: { summaryHistory } })}
+                  disabled={summaryHistory.length === 0}
+                  className={`px-5 py-2 rounded-lg font-bold transition text-base shadow-md ${
+                    summaryHistory.length === 0
+                      ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                      : 'bg-[#121212] text-[#FFF] hover:brightness-105'
+                  }`}
+                  style={{ minWidth: 120 }}
+                >
+                  탐색 종료
+                </button>
+              </div>
               <button
+                className="absolute left-1/2 -translate-x-1/2 px-5 py-2 rounded-lg font-bold transition text-base shadow-md"
+                style={{ minWidth: 180, zIndex: 10,
+                  backgroundColor: selectedKeywords.length === 0 || loading ? '#E7E7E7' : '#ffce00',
+                  color: selectedKeywords.length === 0 || loading ? '#AAAAAA' : '#121212',
+                  cursor: selectedKeywords.length === 0 || loading ? 'not-allowed' : 'pointer'
+                }}
                 onClick={handleConfirmKeywords}
                 disabled={selectedKeywords.length === 0 || loading}
-                className={`px-5 py-2 rounded-lg font-bold transition text-base shadow-md ${
-                  selectedKeywords.length === 0 || loading
-                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                    : 'bg-[#ffce00] text-[#121212] hover:brightness-105'
-                }`}
-                style={{ minWidth: 180 }}
               >
                 키워드 생성하기
               </button>
-
-              {/* ✅ 완료 버튼 추가 */}
-              <button
-                onClick={() => navigate('/final', { state: { summaryHistory } })}
-                disabled={summaryHistory.length === 0}
-                className={`px-5 py-2 rounded-lg font-bold transition text-base shadow-md ${
-                  summaryHistory.length === 0
-                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                    : 'bg-[#121212] text-[#FFF] hover:brightness-105'
-                }`}
-                style={{ minWidth: 120 }}
-              >
-                탐색 종료
-              </button>
-              
             </div>
-            
           </div>
         </div>
 

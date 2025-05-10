@@ -52,6 +52,7 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
           {coords.slice(0, keywords.length).map(({ q, r, s }, i) => {
             const kw = keywords[i];
             const isSelected = kw && selected.includes(kw);
+            const isFirst = i === 0;
             return (
               <Hexagon
                 key={`${q},${r},${s}`}
@@ -63,7 +64,8 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                 onMouseLeave={() => setHoveredIdx(null)}
                 style={{
                   fill: hoveredIdx === i ? '#ffce00' : isSelected ? '#F7DA21' : '#E5E7EB',
-                  stroke: 'none', // 테두리 제거
+                  stroke: isFirst ? '#ffce00' : 'none', // 첫 키워드만 노란색 테두리
+                  strokeWidth: isFirst ? 1 : 0,
                   cursor: kw ? 'pointer' : 'default',
                   transition: 'fill 0.2s',
                 }}
@@ -80,6 +82,9 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                       userSelect: 'none',
                       fontFamily: 'var(--font-family-main)',
                       shapeRendering: 'geometricPrecision',
+                      stroke: 'none',
+                      strokeWidth: 0,
+                      paintOrder: 'fill',
                     }}
                   >
                     {kw}
