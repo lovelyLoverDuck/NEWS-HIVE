@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { FaForumbee } from 'react-icons/fa';
 
 function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,27 +42,14 @@ function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDF6E3] p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7DA21] p-6">
       {/* 상단 아이콘 (Cube Transparent로 변경) */}
       <div className="mb-6">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          strokeWidth="1.5" 
-          stroke="#6F4E37" 
-          className="w-16 h-16"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            d="M21 16.5V7.5m0 9a2.25 2.25 0 01-1.125 1.946l-7.5 4.33a2.25 2.25 0 01-2.25 0l-7.5-4.33A2.25 2.25 0 013 16.5m18 0v-9m0 0a2.25 2.25 0 00-1.125-1.946l-7.5-4.33a2.25 2.25 0 00-2.25 0l-7.5 4.33A2.25 2.25 0 003 7.5m18 0L12 13.5m0 0L3 7.5m9 6l0 9"
-          />
-        </svg>
+        <FaForumbee className="w-16 h-16 text-[#6F4E37]" />
       </div>
 
       {/* 타이틀 */}
-      <h1 className="text-3xl font-bold mb-8 text-[#1C1C1C]">
+      <h1 className="text-3xl font-bold mb-8 text-[#121212]">
         News Hive
       </h1>
 
@@ -75,12 +63,12 @@ function SearchPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="검색어를 입력하세요"
-          className="border border-[#6F4E37] p-3 rounded-md w-full text-[#1C1C1C] shadow-md placeholder-[#6F4E37] focus:outline-none focus:ring-2 focus:ring-[#FFB300] bg-white disabled:bg-[#FDF6E3]"
+          className="border border-[#121212] p-3 rounded-md w-full text-[#121212] shadow-md placeholder-[#121212] focus:outline-none focus:ring-2 focus:ring-[#121212] bg-white disabled:bg-[#F7DA21]"
           disabled={isLoading}
         />
         <button 
           type="submit"
-          className="bg-[#FFB300] text-[#1C1C1C] font-semibold p-3 rounded-md hover:bg-[#FFD54F] transition-all transform active:scale-95 disabled:bg-[#FFD54F] w-14 h-14 flex items-center justify-center"
+          className="bg-[#121212] text-[#F8F8F8] font-semibold p-3 rounded-md hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 w-14 h-14 flex items-center justify-center"
           disabled={isLoading}
         >
           {isLoading ? (
