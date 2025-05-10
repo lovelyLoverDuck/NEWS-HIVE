@@ -12,7 +12,46 @@ function FinalPage() {
   const [userMemo, setUserMemo] = useState('');
   const typedSummaryHistory: SummaryItem[] = summaryHistory as SummaryItem[];
 
+  // 최종 보고 관련 상태
+  const [finalReport, setFinalReport] = useState('');
+  const [definitions, setDefinitions] = useState<{[k: string]: string}>({});
+  const [loadingReport, setLoadingReport] = useState(false);
+  const [errorReport, setErrorReport] = useState('');
+
   const reportRef = useRef<HTMLDivElement>(null);
+
+  // 최종 보고 fetch
+  React.useEffect(() => {
+    const fetchFinalReport = async () => {
+      if (!typedSummaryHistory.length) return;
+      const last = typedSummaryHistory[typedSummaryHistory.length - 1];
+      if (!last.keywords?.length || !last.summary) return;
+      setLoadingReport(true);
+      setErrorReport('');
+      try {
+        const resp = await fetch('http://localhost:5001/final_report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            keywords: last.keywords,
+            summary: last.summary,
+          }),
+        });
+        const data = await resp.json();
+        if (resp.ok && data.final_report) {
+          setFinalReport(data.final_report);
+          setDefinitions(data.definitions || {});
+        } else {
+          setErrorReport(data.error || '최종 보고 생성 실패');
+        }
+      } catch (e) {
+        setErrorReport('최종 보고 생성 실패');
+      }
+      setLoadingReport(false);
+    };
+    fetchFinalReport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typedSummaryHistory]);
 
   const handleExportPDF = async () => {
     if (!reportRef.current) return;
@@ -66,6 +105,22 @@ function FinalPage() {
               </React.Fragment>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* 최종 보고 영역 */}
+      {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
+        <div className="w-full flex flex-col items-center justify-center mb-8">
+          <h2 className="text-xl font-bold my-2">최종 보고</h2>
+          {loadingReport ? (
+            <div className="text-gray-500">최종 보고 생성 중...</div>
+          ) : errorReport ? (
+            <div className="text-red-500">{errorReport}</div>
+          ) : finalReport ? (
+            <div className="bg-gray-50 p-4 rounded shadow w-full max-w-2xl text-left whitespace-pre-line border border-[#f7da21]">
+              {finalReport}
+            </div>
+          ) : null}
         </div>
       )}
 

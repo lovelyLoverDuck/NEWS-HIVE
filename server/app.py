@@ -69,8 +69,25 @@ def summary():
         print(f"❌ 요약 API 실패: {e}")
         return jsonify({'error': str(e)}), 500 
 
+# === 최종 보고 엔드포인트 ===
+from gpt_processor import define_keywords
 
-
+@app.route('/final_report', methods=['POST'])
+@cross_origin()
+def final_report():
+    try:
+        data = request.get_json()
+        keywords = data.get('keywords', [])
+        summary = data.get('summary', '')
+        if not keywords or not isinstance(keywords, list) or not summary:
+            return jsonify({'error': '키워드 리스트와 요약문이 필요합니다.'}), 400
+        from gpt_processor import define_keywords
+        keyword_definitions = define_keywords(keywords, summary)
+        final_report = f"키워드 정의:\n" + "\n".join([f"- {k}: {v}" for k, v in keyword_definitions.items()]) + f"\n\n요약:\n{summary}"
+        return jsonify({'final_report': final_report, 'definitions': keyword_definitions})
+    except Exception as e:
+        print(f"❌ 최종 보고 API 실패: {e}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
