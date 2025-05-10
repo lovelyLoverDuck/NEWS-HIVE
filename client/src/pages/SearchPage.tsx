@@ -72,13 +72,11 @@ function SearchPage() {
           disabled={isLoading}
         >
           {isLoading ? (
-            // 로딩 스피너
-            <svg className="animate-spin w-6 h-6 text-[#1C1C1C]" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin w-6 h-6 text-[#F8F8F8]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
             </svg>
           ) : (
-            // 검색 아이콘
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"  
               viewBox="0 0 24 24" strokeWidth="1.5" 
               stroke="currentColor" className="w-6 h-6">
