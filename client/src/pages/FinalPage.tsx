@@ -239,7 +239,7 @@ function FinalPage() {
             color: '#FFFFFF',
           }}
         >
-          메모 복사하기
+          나의 메모 복사하기
         </button>
       </div>
       <ul className="space-y-6 mt-12"></ul>
