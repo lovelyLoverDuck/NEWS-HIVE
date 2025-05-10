@@ -32,6 +32,18 @@ function ResultsPage() {
   const [resultKeywords, setResultKeywords] = useState<string[]>(safeKeywords.length > 0 ? safeKeywords : ['예시1', '예시2', '예시3']);
   const [loading, setLoading] = useState(false);
 
+  // 사용자 입력 키워드 추가 상태
+  const [inputKeyword, setInputKeyword] = useState<string>("");
+
+  // 키워드 추가 핸들러
+  const handleAddKeyword = () => {
+    const trimmed = inputKeyword.trim();
+    if (trimmed && !resultKeywords.includes(trimmed)) {
+      setResultKeywords(prev => [trimmed, ...prev]);
+      setInputKeyword("");
+    }
+  };
+
   React.useEffect(() => {
     setResultKeywords(safeKeywords.length > 0 ? safeKeywords : ['예시1', '예시2', '예시3']);
   }, [safeKeywords]);
@@ -148,12 +160,29 @@ function ResultsPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* 좌측: 키워드 버튼 */}
         <div className="w-2/3 p-4 border-r border-gray-300 overflow-auto">
-          {/* 임시 육각형 테스트
-          <HexKeywordGrid
-            keywords={resultKeywords}
-            selected={selectedKeywords}
-            onToggle={handleToggle}
-          /> */}
+          {/* 키워드 입력 및 추가 */}
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="text"
+              value={inputKeyword}
+              onChange={e => setInputKeyword(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
+              placeholder="키워드 입력"
+              className="border px-2 py-1 rounded w-40 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
+            />
+            <button
+              onClick={handleAddKeyword}
+              disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
+              className={`px-3 py-1 rounded font-semibold transition ${!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              추가
+            </button>
+          </div>
+          {/* 키워드 버튼 리스트 */}
           <div className="flex flex-wrap gap-2">
             {resultKeywords.map((kw) => (
               <button
