@@ -1,6 +1,5 @@
-from gpt_processor import extract_keywords
-
 def process_news(query_list, is_initial=True, max_results=500):
+    from gpt_processor import extract_keywords
     import numpy as np
     import pandas as pd
     import html
@@ -15,6 +14,7 @@ def process_news(query_list, is_initial=True, max_results=500):
     from sklearn.cluster import DBSCAN
     from config import NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
     from redis_manager import RedisManager
+    from datetime import datetime
 
     if isinstance(query_list, str):
         # 기존 단일 query 입력도 허용
@@ -78,6 +78,13 @@ def process_news(query_list, is_initial=True, max_results=500):
         exit()
 
     # ------ 함수 정의 ------
+    def convert_pubdate(date_str):
+        dt = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+        hour = dt.hour
+        ampm = "오전" if hour < 12 else "오후"
+        hour_12 = hour if 1 <= hour <= 12 else abs(
+            hour - 12) if hour != 0 else 12
+        return f"{dt.year}.{dt.month:02}.{dt.day:02}. {ampm} {hour_12}:{dt.minute:02}"
 
     def clean_html(raw_text):
         decoded_text = html.unescape(str(raw_text))
@@ -134,6 +141,7 @@ def process_news(query_list, is_initial=True, max_results=500):
     articles_df['description'] = articles_df['description'].apply(clean_html)
     articles_df['text'] = articles_df['title'] + \
         " " + articles_df['description']
+    articles_df['pubDate'] = articles_df['pubDate'].apply(convert_pubdate)
 
     # 2. 형태소 분석 (soynlp 기반)
     word_extractor = WordExtractor()
@@ -161,30 +169,13 @@ def process_news(query_list, is_initial=True, max_results=500):
         print("유효한 실루엣 점수가 충분하지 않아 기본 파라미터 사용")
         epsInput = 0.2
         min_samplesInput = 2
-
     # 3. 중복 제거
     num_cu = 1
     if (second_best['num_clusters'] < 4):
         num_cu = 2
     deduplicated_df = deduplicate_articles(
         articles_df, epsInput, min_samplesInput, num_cu)
-
     # 4. 결과
-    print("\n===   결과   ===")
-
-    '''
-    deduplicated_df --> title / description / pubDate / originallink / text / processed_text / cluster
-    text = title + description 
-    processed_text = def processed_text(text)
-    '''
-
-    for i, title in enumerate(deduplicated_df['title'], start=1):
-        print(f"{i}. {title}")
-
-
-
-    from redis_manager import RedisManager
-
     result = {
         "articles": deduplicated_df.to_dict(orient='records'),
         "keywords": []
@@ -197,13 +188,13 @@ def process_news(query_list, is_initial=True, max_results=500):
             if isinstance(raw_keywords, list) and all(isinstance(kw, str) for kw in raw_keywords):
                 # 검색어(조합일 경우 전체 문자열) 포함
                 base_query = " ".join(query_list).strip()
-                keywords = [base_query] if base_query and base_query not in raw_keywords else []
+                keywords = [
+                    base_query] if base_query and base_query not in raw_keywords else []
                 for kw in raw_keywords:
                     if kw != base_query:
                         keywords.append(kw)
                     if len(keywords) >= 3:
                         break
-                print(f"🔍 유효 키워드(검색어 포함, 3개 제한): {keywords}")
             else:
                 print(f"⚠️ 잘못된 키워드 형식: {type(raw_keywords)}")
                 keywords = []
@@ -212,14 +203,12 @@ def process_news(query_list, is_initial=True, max_results=500):
             # Redis 저장 로직 (최초 검색어 조합에만 저장)
             redis_mgr = RedisManager()
             news_links = deduplicated_df['originallink'].tolist()
-            valid_links = [link for link in news_links if isinstance(link, str) and link.startswith('http')]
-            print(f"🔗 유효 링크: {len(valid_links)}/{len(news_links)}")
+            valid_links = [link for link in news_links if isinstance(
+                link, str) and link.startswith('http')]
             search_key = " ".join(query_list)
             redis_mgr.save_keywords([search_key], valid_links)
-            print(f"✅ {len(valid_links)}개 링크 저장 완료")
             articles = deduplicated_df.to_dict('records')
             redis_mgr.save_news_articles(articles)
-            print(f"✅ {len(articles)}개 뉴스 기사 전체 저장 완료")
         except Exception as e:
             print(f"❌ 저장 실패: {str(e)}")
     # 파생/조합 검색 시에는 기사만 반환, 키워드 추출X, 저장X
