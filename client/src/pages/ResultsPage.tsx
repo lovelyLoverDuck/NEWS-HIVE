@@ -141,14 +141,14 @@ function ResultsPage() {
                   : 'bg-[#121212] text-white hover:opacity-90'
               }`}
             >
-              키워드 확정(추출)
+              키워드 생성하기
             </button>
             <input
               type="text"
               value={inputKeyword}
               onChange={e => setInputKeyword(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
-              placeholder="키워드 입력"
+              placeholder="새로운 키워드 입력"
               className="border px-2 py-1 rounded w-40 focus:outline-none"
               style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212' }}
               autoFocus
@@ -178,7 +178,7 @@ function ResultsPage() {
           <div className="mb-4 rounded p-3" style={{ backgroundColor: '#F7DA21', color: '#121212' }}>
             {summary ? (
               <>
-                <h3 className="font-semibold text-lg mb-2">📝 GPT 요약</h3>
+                <h3 className="font-semibold text-lg mb-2">📝 인공지능 요약</h3>
                 <p className="text-sm whitespace-pre-wrap">{summary}</p>
               </>
             ) : (
@@ -186,7 +186,7 @@ function ResultsPage() {
             )}
           </div>  
 
-          <h2 className="text-xl font-bold mb-2">📰 뉴스 기사 수: {resultArticles.length}</h2>
+          <h2 className="text-xl font-bold mb-2">📰 뉴스 기사 수 : {resultArticles.length}</h2>
           <ul className="space-y-4">
             {resultArticles.map((item, idx) => (
               <li
@@ -198,10 +198,10 @@ function ResultsPage() {
                 <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#121212' }}>{item.title}</a>
                 </h3>
                 <p className="text-sm mb-1">
-                <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#111111' }}>{item.description}</a>
+                <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#808080' }}>{item.description}</a>
                 </p>
                 <p className="text-sm">
-                  <span>발행일: {item.pubDate}</span>
+                  <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#808080' }}>발행일 : {item.pubDate}</a>
                 </p>
               </li>
             ))}
