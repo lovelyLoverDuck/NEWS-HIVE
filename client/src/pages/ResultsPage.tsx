@@ -114,7 +114,7 @@ function ResultsPage() {
             <FaHome size={20} />
           </Link>
         </div>
-        <button
+        {/* <button
           onClick={() => navigate('/final', { state: { summaryHistory } })}
           disabled={summaryHistory.length === 0}
           className={`px-4 py-2 rounded font-semibold transition ${
@@ -124,7 +124,7 @@ function ResultsPage() {
           }`}
         >
           완료
-        </button>
+        </button> */}
       </div>
 
       {/* 본문 */}
@@ -166,7 +166,7 @@ function ResultsPage() {
               />
             </div>
             {/* 하단: 키워드 생성 버튼 */}
-            <div className="sticky bottom-0 left-0 w-full bg-white pt-2 pb-4 flex justify-center shadow-[0_-2px_8px_rgba(0,0,0,0.04)] z-10">
+            <div className="sticky bottom-0 left-0 w-full bg-white pt-2 pb-4 flex justify-center gap-100 shadow-[0_-2px_8px_rgba(0,0,0,0.04)] z-10">
               <button
                 onClick={handleConfirmKeywords}
                 disabled={selectedKeywords.length === 0 || loading}
@@ -179,7 +179,23 @@ function ResultsPage() {
               >
                 키워드 생성하기
               </button>
+
+              {/* ✅ 완료 버튼 추가 */}
+              <button
+                onClick={() => navigate('/final', { state: { summaryHistory } })}
+                disabled={summaryHistory.length === 0}
+                className={`px-5 py-2 rounded-lg font-bold transition text-base shadow-md ${
+                  summaryHistory.length === 0
+                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                    : 'bg-[#121212] text-[#FFF] hover:brightness-105'
+                }`}
+                style={{ minWidth: 120 }}
+              >
+                탐색 종료
+              </button>
+              
             </div>
+            
           </div>
         </div>
 
