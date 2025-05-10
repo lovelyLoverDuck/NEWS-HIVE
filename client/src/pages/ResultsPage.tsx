@@ -10,12 +10,15 @@ function ResultsPage() {
   const [summary, setSummary] = useState<string>('');
   const [summaryHistory, setSummaryHistory] = useState<{ keywords: string[], summary: string }[]>([]);
   const { query_list = [], is_initial = true, articles = [], keywords = [] } = location.state || {};
+
+  const primaryQuery = query_list[0] || '';
   const safeArticles = Array.isArray(articles) ? articles : [];
   const safeKeywords = Array.isArray(keywords) ? keywords : ['예시1', '예시2', '예시3'];
+  const reorderedKeywords = [primaryQuery, ...safeKeywords.filter(k => k !== primaryQuery)];
 
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [resultArticles, setResultArticles] = useState<any[]>(safeArticles);
-  const [resultKeywords, setResultKeywords] = useState<string[]>(safeKeywords);
+  const [resultKeywords, setResultKeywords] = useState<string[]>(reorderedKeywords);
   const [loading, setLoading] = useState(false);
   const [inputKeyword, setInputKeyword] = useState<string>("");
 
@@ -24,10 +27,6 @@ function ResultsPage() {
       navigate('/', { replace: true });
     }
   }, [location.state, navigate]);
-
-  useEffect(() => {
-    setResultKeywords(safeKeywords);
-  }, []);
 
   const handleAddKeyword = () => {
     const trimmed = inputKeyword.trim();
@@ -108,14 +107,10 @@ function ResultsPage() {
 
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: '#FFFFFF', color: '#121212' }}>
-      {/* ✅ 상단바: 홈 + 완료 버튼 분리 */}
+      {/* 상단바 */}
       <div className="h-[60px] px-4 py-2 flex items-center justify-between border-b" style={{ borderColor: '#E7E7E7' }}>
         <div className="flex gap-2 items-center">
-          <Link
-            to="/"
-            className="bg-[#121212] text-white p-2 rounded hover:opacity-80"
-            title="처음으로"
-          >
+          <Link to="/" className="bg-[#121212] text-white p-2 rounded hover:opacity-80" title="처음으로">
             <FaHome size={20} />
           </Link>
         </div>
@@ -132,9 +127,9 @@ function ResultsPage() {
         </button>
       </div>
 
-      {/* 중간 콘텐츠 */}
+      {/* 본문 */}
       <div className="flex flex-1 overflow-hidden">
-        {/* 좌측 키워드 */}
+        {/* 좌측 키워드 영역 */}
         <div className="w-2/3 p-4 border-r overflow-auto" style={{ borderColor: '#E7E7E7' }}>
           <div className="flex items-center gap-2 mb-4">
             <button
@@ -178,7 +173,7 @@ function ResultsPage() {
           />
         </div>
 
-        {/* 우측 뉴스 + 요약 */}
+        {/* 우측 기사/요약 영역 */}
         <div className="w-1/3 p-4 overflow-auto">
           <div className="mb-4 rounded p-3" style={{ backgroundColor: '#F7DA21', color: '#121212' }}>
             {summary ? (
@@ -189,7 +184,7 @@ function ResultsPage() {
             ) : (
               <p className="text-sm text-[#666]">요약 결과가 여기에 표시됩니다.</p>
             )}
-          </div>
+          </div>  
 
           <h2 className="text-xl font-bold mb-2">📰 뉴스 기사 수: {resultArticles.length}</h2>
           <ul className="space-y-4">
