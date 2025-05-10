@@ -14,11 +14,11 @@
   --color-bg-alt: #f7f3d7;
   --color-primary: #ffce00; /* Spelling Bee yellow */
   --color-primary-dark: #e5b700;
-  --color-secondary: #22223b;
-  --color-text: #222;
+  --color-secondary: #5D3A00;
+  --color-text: #000000;
   --color-text-light: #888;
   --color-border: #d4cfc5;
-  --color-accent: #fff;
+  --color-accent: #ffff;
   --color-hex: #ffe066; /* honeycomb cell */
   --color-hex-border: #bfa900;
 }
