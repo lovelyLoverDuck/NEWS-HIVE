@@ -24,6 +24,8 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
+node_modules/
+public/
 
 # IDE
 .idea/
