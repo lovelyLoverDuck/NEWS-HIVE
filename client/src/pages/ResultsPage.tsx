@@ -106,7 +106,7 @@ function ResultsPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: '#FFFFFF', color: '#121212' }}>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: '#FFFFFF', color: '#121212', fontFamily: "var(--font-family-main)" }}>
       {/* 상단바 */}
       <div className="h-[60px] px-4 py-2 flex items-center justify-between border-b" style={{ borderColor: '#E7E7E7' }}>
         <div className="flex gap-2 items-center">
@@ -131,46 +131,56 @@ function ResultsPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* 좌측 키워드 영역 */}
         <div className="w-2/3 p-4 border-r overflow-auto" style={{ borderColor: '#E7E7E7' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <button
-              onClick={handleConfirmKeywords}
-              disabled={selectedKeywords.length === 0 || loading}
-              className={`px-3 py-1 rounded font-semibold transition ${
-                selectedKeywords.length === 0 || loading
-                  ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                  : 'bg-[#121212] text-white hover:opacity-90'
-              }`}
-            >
-              키워드 생성하기
-            </button>
-            <input
-              type="text"
-              value={inputKeyword}
-              onChange={e => setInputKeyword(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
-              placeholder="새로운 키워드 입력"
-              className="border px-2 py-1 rounded w-40 focus:outline-none"
-              style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212' }}
-              autoFocus
-              disabled={loading}
-            />
-            <button
-              onClick={handleAddKeyword}
-              disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
-              className={`px-3 py-1 rounded font-semibold transition ${
-                !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
-                  ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                  : 'bg-[#121212] text-white hover:opacity-90'
-              }`}
-            >
-              추가
-            </button>
+          <div className="flex flex-col gap-4 h-full">
+            {/* 상단: 키워드 입력 영역 */}
+            <div className="flex gap-2 items-center bg-[#f8f8f8] p-3 rounded shadow-sm mb-2">
+              <input
+                type="text"
+                value={inputKeyword}
+                onChange={e => setInputKeyword(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
+                placeholder="새로운 키워드 입력"
+                className="border px-2 py-1 rounded w-40 focus:outline-none"
+                style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212', fontSize: '13px' }}
+                autoFocus
+                disabled={loading}
+              />
+              <button
+                onClick={handleAddKeyword}
+                disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
+                className={`px-3 py-1 rounded font-semibold transition ${
+                  !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
+                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                    : 'bg-[#121212] text-white hover:opacity-90'
+                }`}
+              >
+                추가
+              </button>
+            </div>
+            {/* 중간: 헥사곤 키워드 그리드 */}
+            <div className="flex-1 flex items-center justify-center">
+              <HexKeywordGrid
+                keywords={resultKeywords}
+                selected={selectedKeywords}
+                onToggle={handleToggle}
+              />
+            </div>
+            {/* 하단: 키워드 생성 버튼 */}
+            <div className="sticky bottom-0 left-0 w-full bg-white pt-2 pb-4 flex justify-center shadow-[0_-2px_8px_rgba(0,0,0,0.04)] z-10">
+              <button
+                onClick={handleConfirmKeywords}
+                disabled={selectedKeywords.length === 0 || loading}
+                className={`px-5 py-2 rounded-lg font-bold transition text-base shadow-md ${
+                  selectedKeywords.length === 0 || loading
+                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                    : 'bg-[#ffce00] text-[#121212] hover:brightness-105'
+                }`}
+                style={{ minWidth: 180 }}
+              >
+                키워드 생성하기
+              </button>
+            </div>
           </div>
-          <HexKeywordGrid
-            keywords={resultKeywords}
-            selected={selectedKeywords}
-            onToggle={handleToggle}
-          />
         </div>
 
         {/* 우측 기사/요약 영역 */}

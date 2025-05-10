@@ -42,7 +42,7 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
         alignItems: 'center',
       }}
     >
-      <HexGrid width={700} height={700} viewBox="-80 -60 160 120">
+      <HexGrid width={700} height={700} viewBox="-80 -40 160 120">
         <Layout
           size={{ x: 12, y: 12 }}
           flat={false}
@@ -78,7 +78,7 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                     style={{
                       fill: '#121212',
                       userSelect: 'none',
-                      fontFamily: 'Arial, sans-serif',
+                      fontFamily: 'var(--font-family-main)',
                       shapeRendering: 'geometricPrecision',
                     }}
                   >
