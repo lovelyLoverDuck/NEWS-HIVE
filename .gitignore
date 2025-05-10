@@ -37,9 +37,6 @@ public/
 .env
 server/config.py
 # 프로젝트 설정파일 무시
-*config*
-*.config.*
-*.env*
 client/node_modules/.package-lock.json
 client/node_modules/.vite/deps/_metadata.json
 client/node_modules/.vite/deps/chunk-QH6HOCAD.js

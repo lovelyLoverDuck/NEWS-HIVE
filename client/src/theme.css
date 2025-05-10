@@ -1,0 +1,66 @@
+/* Spelling Bee (NYT) inspired color palette & typography */
+:root {
+  /* Typography */
+  --font-family-main: 'Georgia', 'Times New Roman', Times, serif;
+  --font-size-base: 18px;
+  --font-size-lg: 22px;
+  --font-size-xl: 28px;
+  --font-size-sm: 15px;
+  --font-weight-bold: 700;
+  --font-weight-normal: 400;
+
+  /* Colors (NYT Spelling Bee inspired) */
+  --color-bg: #fffbe6;
+  --color-bg-alt: #f7f3d7;
+  --color-primary: #ffce00; /* Spelling Bee yellow */
+  --color-primary-dark: #e5b700;
+  --color-secondary: #22223b;
+  --color-text: #222;
+  --color-text-light: #888;
+  --color-border: #d4cfc5;
+  --color-accent: #ff6663;
+  --color-hex: #ffe066; /* honeycomb cell */
+  --color-hex-border: #bfa900;
+}
+
+body {
+  font-family: var(--font-family-main);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-family-main);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-secondary);
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Utility classes for consistent usage */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-accent { color: var(--color-accent); }
+.bg-primary { background: var(--color-primary); }
+.bg-hex { background: var(--color-hex); }
+.border-hex { border-color: var(--color-hex-border); }
+
+/* Example for honeycomb cell */
+.hex-cell {
+  background: var(--color-hex);
+  border: 2px solid var(--color-hex-border);
+  border-radius: 12px;
+  color: var(--color-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(200, 180, 0, 0.08);
+}
