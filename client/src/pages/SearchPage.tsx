@@ -43,27 +43,29 @@ function SearchPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7DA21] p-6">
-      {/* 상단 아이콘 (Cube Transparent로 변경) */}
+      {/* 상단 아이콘 */}
       <div className="mb-6">
-        <FaForumbee className="w-16 h-16 text-[#6F4E37]" />
+        <FaForumbee className="w-28 h-28 text-[#6F4E37]" />
       </div>
 
       {/* 타이틀 */}
-      <h1 className="text-3xl font-bold mb-8 text-[#121212]">
+      <h1 className="text-9xl font-bold mb-8 text-[#5D3A00]">
         News Hive
       </h1>
 
       {/* 검색 폼 */}
       <form 
         onSubmit={handleSearch} 
-        className="flex items-center space-x-4 w-full max-w-md"
+        className="flex items-center space-x-4 w-full max-w-2xl"
       >
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="검색어를 입력하세요"
-          className="border border-[#121212] p-3 rounded-md w-full text-[#121212] shadow-md placeholder-[#121212] focus:outline-none focus:ring-2 focus:ring-[#121212] bg-white disabled:bg-[#F7DA21]"
+          className={`border border-[#121212] p-3 rounded-md w-full text-[#121212] shadow-md placeholder-[#121212] focus:outline-none focus:ring-2 focus:ring-[#121212] bg-white transition duration-300 ${
+            isLoading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           disabled={isLoading}
         />
         <button 
