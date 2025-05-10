@@ -30,34 +30,38 @@ function FinalPage() {
 
   return (
     <div className="p-6 min-h-screen" style={{ backgroundColor: '#FFFFFF', color: '#121212' }}>
-      {/* 상단 홈 버튼 + 제목 */}
-      <div className="flex items-center mb-6">
+      {/* 좌상단 홈 버튼 + 중앙 타이틀+라벨 */}
+      <div className="flex items-start mb-6">
         <Link
           to="/"
-          className="mr-3 bg-[#121212] text-white p-2 rounded hover:opacity-80"
+          className="bg-[#121212] text-white p-2 rounded hover:opacity-80 mr-4 mt-1"
           title="처음으로"
         >
           <FaHome size={20} />
         </Link>
-        <h1 className="text-2xl font-bold">최종 요약 결과</h1>
+        <div className="flex-1 flex flex-col items-center">
+          <h1 className="text-3xl font-bold text-center">최종 요약 결과</h1>
+          {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
+            <div className="text-[#121212] font-semibold mt-7 mb-4 text-lg text-center">선택한 키워드</div>
+          )}
+        </div>
       </div>
 
-      {/* 선택한 키워드 시각화 */}
+      {/* 완전 중앙 정렬된 키워드 시각화 */}
       {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-        <div className="mb-8 mt-2 w-full flex flex-col items-center">
-          <div className="text-[#121212] font-semibold mb-3 text-lg">선택한 키워드</div>
-          <div className="flex items-center gap-0 justify-center w-full">
+        <div className="mb-8 w-full flex flex-col items-center justify-center">
+          <div className="flex flex-row items-center justify-center w-full">
             {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => (
               <React.Fragment key={idx}>
                 <div
                   className="flex items-center justify-center rounded-full overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 70, height: 70, background: '#F7DA21', color: '#121212', fontWeight: 600, fontSize: arr.length > 6 ? 17 : 24, maxWidth: 70 }}
+                  style={{ width: 110, height: 110, background: '#F7DA21', color: '#121212', fontWeight: 600, fontSize: arr.length > 6 ? 22 : 28, maxWidth: 110 }}
                   title={kw}
                 >
-                  <span className="px-2 w-full text-center block overflow-hidden text-ellipsis whitespace-nowrap" style={{fontSize: arr.length > 8 ? 13 : arr.length > 6 ? 16 : 20}}>{kw}</span>
+                  <span className="px-3 w-full text-center block overflow-hidden text-ellipsis whitespace-nowrap" style={{fontSize: arr.length > 8 ? 17 : arr.length > 6 ? 20 : 24}}>{kw}</span>
                 </div>
                 {idx < arr.length - 1 && (
-                  <div className="mx-2" style={{ height: 4, width: 56, background: '#e5e7eb', borderRadius: 2 }}></div>
+                  <div className="mx-4" style={{ height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
                 )}
               </React.Fragment>
             ))}
@@ -65,7 +69,7 @@ function FinalPage() {
         </div>
       )}
 
-      {/* PDF 용 숨김 영역 */}
+      {/* PDF 용 숨김 영역 - 보고서 스타일 */}
       <div
         ref={reportRef}
         style={{
@@ -74,14 +78,43 @@ function FinalPage() {
           top: 0,
           background: '#fff',
           color: '#121212',
-          width: '800px',
-          padding: '32px',
+          width: '900px',
+          padding: '48px 32px',
           zIndex: -1,
           fontFamily: 'system-ui, sans-serif',
-          borderRadius: '12px',
+          borderRadius: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1.5rem' }}>최종 요약 결과</h1>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <h1 style={{ fontSize: '2.7rem', fontWeight: 800, marginBottom: '2.2rem', textAlign: 'center', letterSpacing: '0.02em' }}>최종 요약 결과</h1>
+          {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
+            <div style={{ color: '#121212', fontWeight: 700, fontSize: 22, marginTop: 30, marginBottom: 24, textAlign: 'center' }}>선택한 키워드</div>
+          )}
+        </div>
+        {/* PDF 키워드 바 (중앙 정렬) */}
+        {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+              {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => (
+                <React.Fragment key={idx}>
+                  <div
+                    style={{ width: 110, height: 110, background: '#F7DA21', color: '#121212', fontWeight: 600, fontSize: arr.length > 6 ? 22 : 28, maxWidth: 110, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}
+                    title={kw}
+                  >
+                    <span style={{ padding: '0 14px', width: '100%', textAlign: 'center', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: arr.length > 8 ? 17 : arr.length > 6 ? 20 : 24 }}>{kw}</span>
+                  </div>
+                  {idx < arr.length - 1 && (
+                    <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
+
         {typedSummaryHistory.length === 0 ? (
           <p>요약된 정보가 없습니다.</p>
         ) : (
@@ -155,8 +188,8 @@ function FinalPage() {
         />
       </div>
 
-      {/* 버튼들 */}
-      <div className="mt-6 space-x-2">
+      {/* 하단 버튼들 (실제 화면에서만 보임, PDF에는 포함X) */}
+      <div className="mt-10 flex justify-center gap-4">
         <button
           onClick={handleExportPDF}
           className="px-4 py-2 rounded font-semibold"
