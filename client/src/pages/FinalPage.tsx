@@ -58,12 +58,25 @@ function FinalPage() {
     const canvas = await html2canvas(reportRef.current, {
       scale: 2,
       backgroundColor: '#fff',
+      windowWidth: reportRef.current.scrollWidth,
+      windowHeight: reportRef.current.scrollHeight,
     });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
+    // 여러 페이지 지원 (텍스트 잘림 방지)
+    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+    heightLeft -= pageHeight;
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
     pdf.save('summary.pdf');
   };
 
@@ -80,9 +93,6 @@ function FinalPage() {
         </Link>
         <div className="flex-1 flex flex-col items-center">
           <h1 className="text-3xl font-bold text-center">최종 요약 결과</h1>
-          {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-            <div className="text-[#121212] font-semibold mt-7 mb-4 text-lg text-center">선택한 키워드</div>
-          )}
         </div>
       </div>
 
@@ -134,6 +144,7 @@ function FinalPage() {
           background: '#fff',
           color: '#121212',
           width: '900px',
+          minHeight: '1200px',
           padding: '48px 32px',
           zIndex: -1,
           fontFamily: 'system-ui, sans-serif',
@@ -143,67 +154,127 @@ function FinalPage() {
           alignItems: 'center',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        {/* PDF 전체를 하나의 parent div로 감싼다 */}
+        <div style={{ width: '100%' }}>
+          {/* 최종 요약 결과 제목 (항상 최상단) */}
           <h1 style={{ fontSize: '2.7rem', fontWeight: 800, marginBottom: '2.2rem', textAlign: 'center', letterSpacing: '0.02em' }}>최종 요약 결과</h1>
+          {/* 선택한 키워드 시각화 (제목 아래) */}
           {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-            <div style={{ color: '#121212', fontWeight: 700, fontSize: 22, marginTop: 30, marginBottom: 24, textAlign: 'center' }}>선택한 키워드</div>
-          )}
-        </div>
-        {/* PDF 키워드 바 (중앙 정렬) */}
-        {typedSummaryHistory.length > 0 && typedSummaryHistory[typedSummaryHistory.length-1]?.keywords?.length > 0 && (
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-              {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => (
-                <React.Fragment key={idx}>
-                  <div
-                    style={{ width: 110, height: 110, background: '#F7DA21', color: '#121212', fontWeight: 600, fontSize: arr.length > 6 ? 22 : 28, maxWidth: 110, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}
-                    title={kw}
-                  >
-                    <span style={{ padding: '0 14px', width: '100%', textAlign: 'center', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: arr.length > 8 ? 17 : arr.length > 6 ? 20 : 24 }}>{kw}</span>
-                  </div>
-                  {idx < arr.length - 1 && (
-                    <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
-                  )}
-                </React.Fragment>
-              ))}
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 40 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                {typedSummaryHistory[typedSummaryHistory.length-1].keywords.map((kw, idx, arr) => {
+                  // 자동 폰트 크기 조정 및 ellipsis 적용
+                  let fontSize = 28;
+                  if (kw.length > 7) fontSize = 17;
+                  else if (kw.length > 5) fontSize = 20;
+                  else if (arr.length > 8) fontSize = 17;
+                  else if (arr.length > 6) fontSize = 20;
+                  return (
+                    <React.Fragment key={idx}>
+                      <div
+                        style={{
+                          width: 110,
+                          height: 110,
+                          background: '#F7DA21',
+                          color: '#121212',
+                          fontWeight: 700,
+                          fontSize,
+                          maxWidth: 110,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          margin: 0,
+                          padding: '0 10px',
+                          letterSpacing: '-0.02em',
+                          lineHeight: 1.2,
+                        }}
+                        title={kw}
+                      >
+                        <div style={{
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  textAlign: 'center',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  lineHeight: 1,
+  verticalAlign: 'middle',
+  padding: 0,
+  paddingTop: 26
+}}>{kw}</div>
+                      </div>
+                      {idx < arr.length - 1 && (
+                        <div style={{ margin: '0 18px', height: 5, width: 75, background: '#e5e7eb', borderRadius: 2 }}></div>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
-
-        {typedSummaryHistory.length === 0 ? (
-          <p>요약된 정보가 없습니다.</p>
-        ) : (
-          <ul style={{ marginBottom: '2rem' }}>
-            {typedSummaryHistory.map((item, index) => (
-              <li
-                key={index}
-                style={{
-                  border: '1px solid #E7E7E7',
-                  borderRadius: 8,
-                  padding: 16,
-                  background: '#FAFAFA',
-                  marginBottom: 16,
-                }}
-              >
-                <p style={{ fontSize: 14, color: '#666' }}>🔑 키워드: {item.keywords.join(', ')}</p>
-                <p style={{ marginTop: 8 }}>{item.summary}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div style={{ marginTop: 32 }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 12 }}>📝 나의 메모</h2>
-          <div
-            style={{
-              whiteSpace: 'pre-wrap',
-              border: '1px solid #E7E7E7',
-              borderRadius: 8,
-              padding: 16,
-              background: '#fffbe6',
-              minHeight: 120,
-            }}
-          >
-            {userMemo || <span style={{ color: '#bbb' }}>(메모 없음)</span>}
+          )}
+          {/* 최종 보고 PDF에 반드시 포함 - 키워드 아래 */}
+          {finalReport && (
+            <div
+              style={{
+                background: '#f9f9f9',
+                border: '2px solid #f7da21',
+                borderRadius: 12,
+                padding: 28,
+                margin: '30px 0',
+                width: '100%',
+                fontSize: 18,
+                fontWeight: 500,
+                whiteSpace: 'pre-line',
+                color: '#222',
+              }}
+            >
+              {finalReport}
+            </div>
+          )}
+          {/* summary history */}
+          {typedSummaryHistory.length === 0 ? (
+            <p>요약된 정보가 없습니다.</p>
+          ) : (
+            <ul style={{ marginBottom: '2rem' }}>
+              {typedSummaryHistory.map((item, index) => (
+                <li
+                  key={index}
+                  style={{
+                    border: '1px solid #E7E7E7',
+                    borderRadius: 8,
+                    padding: 16,
+                    background: '#FAFAFA',
+                    marginBottom: 16,
+                  }}
+                >
+                  <p style={{ fontSize: 14, color: '#666' }}>🔑 키워드: {item.keywords.join(', ')}</p>
+                  <p style={{ marginTop: 8 }}>{item.summary}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          {/* PDF 메모 영역 */}
+          <div style={{ marginTop: 32, width: '100%' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 12 }}>📝 나의 메모</h2>
+            <div
+              style={{
+                whiteSpace: 'pre-wrap',
+                border: '1px solid #E7E7E7',
+                borderRadius: 8,
+                padding: 16,
+                background: '#fffbe6',
+                minHeight: 120,
+              }}
+            >
+              {userMemo || <span style={{ color: '#bbb' }}>(메모 없음)</span>}
+            </div>
           </div>
         </div>
       </div>
