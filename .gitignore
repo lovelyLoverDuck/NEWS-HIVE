@@ -36,3 +36,27 @@ public/
 # Environment variables
 .env
 server/config.py
+# 프로젝트 설정파일 무시
+*config*
+*.config.*
+*.env*
+client/node_modules/.package-lock.json
+client/node_modules/.vite/deps/_metadata.json
+client/node_modules/.vite/deps/chunk-QH6HOCAD.js
+client/node_modules/.vite/deps/chunk-QH6HOCAD.js.map
+client/node_modules/.vite/deps/chunk-SPLJIEEX.js
+client/node_modules/.vite/deps/chunk-SPLJIEEX.js.map
+client/node_modules/.vite/deps/chunk-XREXF2BJ.js
+client/node_modules/.vite/deps/chunk-XREXF2BJ.js.map
+client/node_modules/.vite/deps/react-dom_client.js
+client/node_modules/.vite/deps/react-dom_client.js.map
+client/node_modules/.vite/deps/react-hexgrid.js
+client/node_modules/.vite/deps/react-hexgrid.js.map
+client/node_modules/.vite/deps/react-router-dom.js
+client/node_modules/.vite/deps/react-router-dom.js.map
+client/node_modules/.vite/deps/react.js
+client/node_modules/.vite/deps/react_jsx-dev-runtime.js
+client/node_modules/.vite/deps/react_jsx-dev-runtime.js.map
+client/node_modules/.vite/deps/react_jsx-runtime.js
+client/package-lock.json
+client/package.json
