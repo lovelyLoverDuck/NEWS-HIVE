@@ -194,18 +194,14 @@ function ResultsPage() {
                 className="p-3 rounded border"
                 style={{ borderColor: '#E7E7E7', backgroundColor: '#FAFAFA', color: '#121212' }}
               >
-                <h3 className="font-semibold mb-1">{item.title}</h3>
-                <p className="text-sm mb-1">{item.description}</p>
+                <h3 className="font-semibold mb-1">
+                <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#121212' }}>{item.title}</a>
+                </h3>
+                <p className="text-sm mb-1">
+                <a href={item.originallink}  target="_blank"  rel="noopener noreferrer"  style={{ color: '#111111' }}>{item.description}</a>
+                </p>
                 <p className="text-sm">
-                  <a
-                    href={item.originallink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    원문 보기
-                  </a>
-                  <span className="ml-4 text-[#666]">발행일: {item.pubDate}</span>
+                  <span>발행일: {item.pubDate}</span>
                 </p>
               </li>
             ))}
