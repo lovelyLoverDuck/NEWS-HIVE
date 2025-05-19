@@ -30,21 +30,13 @@ except ImportError:
         import re
         # 한글/영문/숫자 단어 추출 (2글자 이상)
         candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', text)
+        print(f"[DEBUG] candidates: {candidates}")  # 디버깅용
         # 조사/의문사/불용어/어미 모두 제거
         particle_pattern = re.compile(r'^(.*?)(는|가|을|를|이|에|의|도|로|과|와|에서|까지|부터|처럼|보다|하고|이나|라도|조차|마저|만큼|씩|뿐|까지도|은|은가|은지|은데|은데도|은데요|은가요|은지요|은가요|은지요|은가요|은지요|은가요|은지요|은가요|은지요)$')
         question_words = set(['어떻게', '왜', '뭐', '무엇', '누구', '언제', '어디', '될까', '되나', '되니', '되냐', '되나요', '되었나', '되었나요', '궁금', '알려줘', '알고싶', '싶다', '싶어요', '싶니', '싶나요', '있나요', '있니', '있나'])
-        processed = []
-        for w in candidates:
-            # 조사 제거
-            m = particle_pattern.match(w)
-            base = m.group(1) if m else w
-            # 불용어/의문사/어미 제거
-            if base in stopwords or base in question_words:
-                continue
-            if len(base) >= 2:
-                processed.append(base)
-        # 남은 명사만 합성해서 한 개의 복합명사 키워드로 반환
-        merged = ' '.join(processed)
+        # 모든 후처리 없이 candidates를 합쳐서 복합명사로 반환
+        print(f"[DEBUG] candidates: {candidates}")  # 디버깅용
+        merged = ' '.join(candidates)
         if merged:
             return [merged]
         else:

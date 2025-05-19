@@ -27,8 +27,32 @@ def extract_keywords(news_data):
         # JSON 파싱 전처리
         cleaned = raw_response.replace("'", '"').strip('` \n') 
         result = json.loads(cleaned)
+        # candidates(입력 명사)와 중복되는 키워드는 제외
+        # news_data가 str 또는 list[dict] 형태일 수 있으므로 분기 처리
+        import re
+        if isinstance(news_data, str):
+            candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', news_data)
+            joined = ' '.join(candidates)
+        elif isinstance(news_data, list) and len(news_data) > 0 and 'content' in news_data[0]:
+            text = ' '.join([item['content'] for item in news_data if 'content' in item])
+            candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', text)
+            joined = ' '.join(candidates)
+        else:
+            candidates = []
+            joined = ''
+        # 모든 연속 조합(2-gram, 3-gram 등)도 후보에 포함
+        candidate_set = set(candidates)
+        n = len(candidates)
+        # 붙여쓰기 및 띄어쓰기 조합 모두 포함
+        for i in range(n):
+            for j in range(i+1, n+1):
+                if j-i >= 2:
+                    candidate_set.add(''.join(candidates[i:j]))     # 붙여쓰기
+                    candidate_set.add(' '.join(candidates[i:j]))   # 띄어쓰기
+        gpt_keywords = result.get('keywords', [])
+        filtered = [kw for kw in gpt_keywords if kw not in candidate_set]
         # 최대 3개까지만 반환
-        return result.get('keywords', [])[:3]
+        return filtered[:3]
         
     except json.JSONDecodeError as e:
         print(f"🚨 JSON 파싱 실패: {e}\n원본: {raw_response}")
