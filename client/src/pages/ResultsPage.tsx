@@ -107,55 +107,40 @@ function ResultsPage() {
 
   return (
     <div className="h-screen flex flex-col" style={{ backgroundColor: '#FFFFFF', color: '#121212', fontFamily: "var(--font-family-main)" }}>
-      {/* 상단바 */}
-      <div className="h-[60px] px-4 py-2 flex items-center justify-between border-b" style={{ borderColor: '#E7E7E7' }}>
-        <div className="flex gap-2 items-center">
-          <Link to="/" className="bg-[#121212] text-white p-2 rounded hover:opacity-80" title="처음으로">
-            <FaHome size={20} />
-          </Link>
-        </div>
-        {/* <button
-          onClick={() => navigate('/final', { state: { summaryHistory } })}
-          disabled={summaryHistory.length === 0}
-          className={`px-4 py-2 rounded font-semibold transition ${
-            summaryHistory.length === 0
-              ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-              : 'bg-[#F7DA21] text-[#121212] hover:brightness-105'
-          }`}
-        >
-          완료
-        </button> */}
-      </div>
-
       {/* 본문 */}
       <div className="flex flex-1 overflow-hidden">
         {/* 좌측 키워드 영역 */}
         <div className="w-2/3 p-4 border-r overflow-auto" style={{ borderColor: '#E7E7E7' }}>
           <div className="flex flex-col gap-4 h-full">
-            {/* 상단: 키워드 입력 영역 */}
-            <div className="flex gap-2 items-center bg-[#f8f8f8] p-3 rounded shadow-sm mb-2">
-              <input
-                type="text"
-                value={inputKeyword}
-                onChange={e => setInputKeyword(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
-                placeholder="새로운 키워드 입력"
-                className="border px-2 py-1 rounded w-40 focus:outline-none"
-                style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212', fontSize: '13px' }}
-                autoFocus
-                disabled={loading}
-              />
-              <button
-                onClick={handleAddKeyword}
-                disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
-                className={`px-3 py-1 rounded font-semibold transition ${
-                  !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
-                    ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                    : 'bg-[#121212] text-white hover:opacity-90'
-                }`}
-              >
-                추가
-              </button>
+            {/* 상단: 키워드 입력 & 홈버튼 영역 */}
+            <div className="flex items-center justify-between bg-[#f8f8f8] p-3 rounded shadow-sm mb-2">
+              <Link to="/" className="bg-[#121212] text-white p-2 rounded hover:opacity-80" title="처음으로">
+                <FaHome size={20} />
+              </Link>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={inputKeyword}
+                  onChange={e => setInputKeyword(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
+                  placeholder="새로운 키워드 입력"
+                  className="border px-2 py-1 rounded w-40 focus:outline-none"
+                  style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212', fontSize: '13px' }}
+                  autoFocus
+                  disabled={loading}
+                />
+                <button
+                  onClick={handleAddKeyword}
+                  disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
+                  className={`px-3 py-1 rounded font-semibold transition ${
+                    !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
+                      ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
+                      : 'bg-[#121212] text-white hover:opacity-90'
+                  }`}
+                >
+                  추가
+                </button>
+              </div>
             </div>
             {/* 중간: 헥사곤 키워드 그리드 */}
             <div className="flex-1 flex items-center justify-center">
