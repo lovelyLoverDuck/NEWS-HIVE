@@ -33,24 +33,41 @@ def extract_keywords(news_data):
         if isinstance(news_data, str):
             candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', news_data)
             joined = ' '.join(candidates)
-        elif isinstance(news_data, list) and len(news_data) > 0 and 'content' in news_data[0]:
-            text = ' '.join([item['content'] for item in news_data if 'content' in item])
+        elif isinstance(news_data, list) and len(news_data) > 0:
+            texts = []
+            for item in news_data:
+                for key in ['content', 'title', 'description']:
+                    if key in item and isinstance(item[key], str):
+                        texts.append(item[key])
+            text = ' '.join(texts)
             candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', text)
             joined = ' '.join(candidates)
         else:
             candidates = []
             joined = ''
         # 모든 연속 조합(2-gram, 3-gram 등)도 후보에 포함
-        candidate_set = set(candidates)
+        def normalize(s):
+            norm = s.replace(' ', '').strip().lower()
+            print(f"[DEBUG] normalize('{s}') -> '{norm}'")
+            return norm
+
+        print(f"[DEBUG] candidates(raw): {candidates}")
+        candidate_set = set([normalize(x) for x in candidates])
         n = len(candidates)
-        # 붙여쓰기 및 띄어쓰기 조합 모두 포함
+        # 붙여쓰기 및 띄어쓰기 조합 모두 포함 (정규화해서 set에 추가)
         for i in range(n):
             for j in range(i+1, n+1):
                 if j-i >= 2:
-                    candidate_set.add(''.join(candidates[i:j]))     # 붙여쓰기
-                    candidate_set.add(' '.join(candidates[i:j]))   # 띄어쓰기
+                    candidate_set.add(normalize(''.join(candidates[i:j])))     # 붙여쓰기
+                    candidate_set.add(normalize(' '.join(candidates[i:j])))   # 띄어쓰기
         gpt_keywords = result.get('keywords', [])
-        filtered = [kw for kw in gpt_keywords if kw not in candidate_set]
+        print(f"[DEBUG] candidate_set: {candidate_set}")
+        print(f"[DEBUG] gpt_keywords(raw): {gpt_keywords}")
+        if not candidate_set:
+            print(f"[DEBUG] candidate_set empty, returning GPT keywords as is")
+            return gpt_keywords[:3]
+        filtered = [kw for kw in gpt_keywords if normalize(kw) not in candidate_set]
+        print(f"[DEBUG] filtered GPT keywords: {filtered}")
         # 최대 3개까지만 반환
         return filtered[:3]
         
