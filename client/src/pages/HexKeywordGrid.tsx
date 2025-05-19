@@ -68,8 +68,8 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle, primary
                 onMouseLeave={() => setHoveredIdx(null)}
                 style={{
                   fill: hoveredIdx === i ? '#ffce00' : isSelected ? '#F7DA21' : '#E5E7EB',
-                  stroke: isPrimary || isConfirmed ? '#ffce00' : isFirst ? '#ffce00' : 'none',
-                  strokeWidth: isPrimary || isConfirmed ? 3 : isFirst ? 1 : 0,
+                  stroke: isPrimary || isConfirmed ? '#ffce00' : 'none',
+                  strokeWidth: isPrimary || isConfirmed ? 1.5 : 0,
                   cursor: kw ? 'pointer' : 'default',
                   transition: 'fill 0.2s, stroke 0.2s, stroke-width 0.2s',
                 }}

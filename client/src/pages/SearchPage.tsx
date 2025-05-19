@@ -4,6 +4,8 @@ import { FaForumbee } from 'react-icons/fa';
 
 function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [composing, setComposing] = useState(false);
+  const [showSpecialCharWarning, setShowSpecialCharWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -60,14 +62,42 @@ function SearchPage() {
       >
         <input
           type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="검색어를 입력하세요"
           className={`border border-[#121212] p-3 rounded-md w-full text-[#121212] shadow-md placeholder-[#121212] focus:outline-none focus:ring-2 focus:ring-[#121212] bg-white transition duration-300 ${
             isLoading ? 'opacity-50 cursor-not-allowed' : ''
           }`}
+          placeholder="검색어를 입력하세요"
+          value={searchQuery}
+          onCompositionStart={() => setComposing(true)}
+          onCompositionEnd={e => {
+            setComposing(false);
+            let value = e.currentTarget.value;
+            const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
+            if (value !== replaced) {
+              setShowSpecialCharWarning(true);
+              setTimeout(() => setShowSpecialCharWarning(false), 2000);
+            }
+            setSearchQuery(replaced);
+          }}
+          onChange={e => {
+            if (composing) {
+              setSearchQuery(e.target.value);
+            } else {
+              let value = e.target.value;
+              const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
+              if (value !== replaced) {
+                setShowSpecialCharWarning(true);
+                setTimeout(() => setShowSpecialCharWarning(false), 2000);
+              }
+              setSearchQuery(replaced);
+            }
+          }}
+          onKeyDown={e => { if (e.key === 'Enter') handleSearch(e); }}
           disabled={isLoading}
+          style={{ minWidth: 0 }}
         />
+        {showSpecialCharWarning && (
+          <div className="text-red-500 text-xs mt-1">특수문자는 입력할 수 없습니다.</div>
+        )}
         <button 
           type="submit"
           className="bg-[#121212] text-[#F8F8F8] font-semibold p-3 rounded-md hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 w-14 h-14 flex items-center justify-center"

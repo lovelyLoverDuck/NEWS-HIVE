@@ -24,6 +24,8 @@ function ResultsPage() {
   const [resultKeywords, setResultKeywords] = useState<string[]>(reorderedKeywords);
   const [loading, setLoading] = useState(false);
   const [inputKeyword, setInputKeyword] = useState<string>("");
+  const [composing, setComposing] = useState(false);
+  const [showSpecialCharWarning, setShowSpecialCharWarning] = useState(false);
 
   useEffect(() => {
     if (!location.state) {
@@ -119,7 +121,7 @@ function ResultsPage() {
             <div className="flex items-center justify-between bg-white/90 p-4 rounded-xl shadow-lg mb-4 border border-[#eee] backdrop-blur-sm">
               <Link
                 to="/"
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-yellow-200 to-yellow-400 shadow hover:scale-105 hover:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center w-14 h-14 rounded-xl bg-yellow-400 shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200"
                 title="홈으로"
               >
                 <FaHome size={28} className="text-[#121212]" />
@@ -128,20 +130,47 @@ function ResultsPage() {
                 <input
                   type="text"
                   value={inputKeyword}
-                  onChange={e => setInputKeyword(e.target.value)}
+                  onCompositionStart={() => setComposing(true)}
+                  onCompositionEnd={e => {
+                    setComposing(false);
+                    let value = e.currentTarget.value;
+                    const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
+                    if (value !== replaced) {
+                      setShowSpecialCharWarning(true);
+                      setTimeout(() => setShowSpecialCharWarning(false), 2000);
+                    }
+                    setInputKeyword(replaced);
+                  }}
+                  onChange={e => {
+                    if (composing) {
+                      setInputKeyword(e.target.value);
+                    } else {
+                      let value = e.target.value;
+                      const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
+                      if (value !== replaced) {
+                        setShowSpecialCharWarning(true);
+                        setTimeout(() => setShowSpecialCharWarning(false), 2000);
+                      }
+                      setInputKeyword(replaced);
+                    }
+                  }}
                   onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
                   placeholder="새 키워드를 입력하세요"
                   className="flex-1 px-4 py-3 rounded-lg border border-[#E7E7E7] bg-[#fafafc] focus:ring-2 focus:ring-yellow-300 focus:border-yellow-400 transition-all text-base shadow-inner"
                   disabled={loading}
                   style={{ minWidth: 0 }}
                 />
+
+                {showSpecialCharWarning && (
+                  <div className="text-red-500 text-xs mt-1">특수문자는 입력할 수 없습니다.</div>
+                )}
                 <button
                   onClick={handleAddKeyword}
                   disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
                   className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all text-base shadow-md
                     ${!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
                       ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                      : 'bg-gradient-to-br from-yellow-300 to-yellow-400 text-[#121212] hover:brightness-105 hover:scale-105'
+                      : 'bg-yellow-400 text-[#121212]'
                     }`}
                 >
                   <span>추가</span>
