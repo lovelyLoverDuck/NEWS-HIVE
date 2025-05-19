@@ -75,7 +75,7 @@ def process_news(query_list, is_initial=True, max_results=500):
 
     if not all_results:
         print("뉴스를 가져오기 실패")
-        raise RuntimeError("뉴스를 가져오기 실패")
+        exit()
 
     # ------ 함수 정의 ------
     def convert_pubdate(date_str):
@@ -175,6 +175,7 @@ def process_news(query_list, is_initial=True, max_results=500):
         num_cu = 2
     deduplicated_df = deduplicate_articles(
         articles_df, epsInput, min_samplesInput, num_cu)
+    print(f"[DEBUG] deduplicated 뉴스 개수: {len(deduplicated_df)}")
     # 4. 결과
     result = {
         "articles": deduplicated_df.to_dict(orient='records'),
@@ -183,6 +184,7 @@ def process_news(query_list, is_initial=True, max_results=500):
 
     if is_initial:
         try:
+            print(f"[DEBUG] GPT 호출 시 뉴스 개수: {len(deduplicated_df)}")
             raw_keywords = extract_keywords(deduplicated_df.to_dict('records'))
             # 🔥 핵심 수정: 항상 검색어(query) 자체를 첫 번째 키워드로 포함, 최대 3개 제한
             if isinstance(raw_keywords, list) and all(isinstance(kw, str) for kw in raw_keywords):
