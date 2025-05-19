@@ -23,11 +23,7 @@ function SearchPage() {
         body: JSON.stringify({ query: searchQuery }),
       });
       const data = await response.json();
-      // 검색 결과 없음 또는 서버에서 알림 메시지(alert) 전달 시 팝업 표시
-      if (data.alert) {
-        alert(`${data.alert}\n추천 키워드: ${data.recommend_keywords ? data.recommend_keywords.join(', ') : ''}`);
-        return; // 경고가 있으면 ResultPage로 이동하지 않음
-      }
+      
       if (response.ok) {
         navigate('/results', {
           state: {

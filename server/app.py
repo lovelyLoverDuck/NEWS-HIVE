@@ -34,7 +34,7 @@ def search():
             query_list = keywords if keywords else [search_query]
 
         processed_results = process_news(query_list, is_initial)
-        print(f"\n=== 뉴스 검색 결과 ({len(processed_results['articles'])}건) ===")
+
         # 항상 query_list를 응답에 포함
         response = dict(processed_results)
         response['query_list'] = query_list
@@ -42,6 +42,7 @@ def search():
         if not response.get('articles'):
             response['recommend_keywords'] = query_list
             response['alert'] = '문장형 검색어 대신 핵심 키워드 위주로 검색해 주세요.'
+
         return jsonify(response)
     except Exception as e:
         print(f"❌ 처리 실패: {e}")
@@ -51,7 +52,8 @@ def search():
                 'articles': [],
                 'query_list': query_list,
                 'recommend_keywords': query_list,
-                'alert': '검색 결과가 없습니다. 문장형 검색어 대신 키워드 위주로 검색해 주세요.'
+                'alert': '검색 결과가 없습니다. 문장형 검색어 대신 키워드 위주로 검색해 주세요.',
+                
             })
         return jsonify({'error': str(e)}), 500
 

@@ -22,7 +22,7 @@ def extract_keywords(news_data):
             response_format={"type": "json_object"}
         )
         raw_response = response.choices[0].message.content
-        print(f"🔍 GPT 원본 응답: {raw_response}")
+
         
         # JSON 파싱 전처리
         cleaned = raw_response.replace("'", '"').strip('` \n') 
@@ -48,10 +48,10 @@ def extract_keywords(news_data):
         # 모든 연속 조합(2-gram, 3-gram 등)도 후보에 포함
         def normalize(s):
             norm = s.replace(' ', '').strip().lower()
-            print(f"[DEBUG] normalize('{s}') -> '{norm}'")
+
             return norm
 
-        print(f"[DEBUG] candidates(raw): {candidates}")
+
         candidate_set = set([normalize(x) for x in candidates])
         n = len(candidates)
         # 붙여쓰기 및 띄어쓰기 조합 모두 포함 (정규화해서 set에 추가)
@@ -61,28 +61,23 @@ def extract_keywords(news_data):
                     candidate_set.add(normalize(''.join(candidates[i:j])))     # 붙여쓰기
                     candidate_set.add(normalize(' '.join(candidates[i:j])))   # 띄어쓰기
         gpt_keywords = result.get('keywords', [])
-        print(f"[DEBUG] candidate_set: {candidate_set}")
-        print(f"[DEBUG] gpt_keywords(raw): {gpt_keywords}")
+
+
         if not candidate_set:
-            print(f"[DEBUG] candidate_set empty, returning GPT keywords as is")
+
             return gpt_keywords[:3]
         filtered = [kw for kw in gpt_keywords if normalize(kw) not in candidate_set]
-        print(f"[DEBUG] filtered GPT keywords: {filtered}")
+
         # 최대 3개까지만 반환
         return filtered[:3]
         
     except json.JSONDecodeError as e:
-        print(f"🚨 JSON 파싱 실패: {e}\n원본: {raw_response}")
+
         return []
 
 # 테스트 코드
-if __name__ == "__main__":
-    sample = [{"content": "AI 기술 발전 현황"}]
-    try:
-        print("추출 키워드:", extract_keywords(sample))
-    except Exception as e:
-        print(e)
-        
+# (테스트 코드 제거됨)
+
 #gpt요약        
 def summarize_articles(news_data):
     try:
@@ -100,10 +95,10 @@ def summarize_articles(news_data):
             ]
         )
         summary = response.choices[0].message.content.strip()
-        print(f"📝 요약문: {summary}")
+
         return summary
     except Exception as e:
-        print(f"❌ GPT 요약 실패: {e}")
+
         return "요약 생성 실패"
 
 def define_keywords(keywords, context):
@@ -120,7 +115,7 @@ def define_keywords(keywords, context):
             )
             definitions[kw] = response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"❌ '{kw}' 정의 실패: {e}")
+
             definitions[kw] = "정의 생성 실패"
     return definitions
 
@@ -140,7 +135,7 @@ def define_keywords(keywords, context):
 #         )
 #         return response.choices[0].message.content.strip()
 #     except Exception as e:
-#         print(f"❌ 최종 보고 리포트 생성 실패: {e}")
+
 #         return "최종 보고 생성 실패"
 
 from openai import OpenAI
@@ -167,5 +162,5 @@ def generate_final_report(keywords, summary):
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        print(f"❌ 최종 보고 리포트 생성 실패: {e}")
+
         return "최종 보고 생성 실패"
