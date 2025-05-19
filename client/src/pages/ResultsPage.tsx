@@ -155,6 +155,8 @@ function ResultsPage() {
                 keywords={resultKeywords}
                 selected={selectedKeywords}
                 onToggle={handleToggle}
+                primaryKeywords={query_list}
+                confirmedKeywords={Array.from(new Set(summaryHistory.flatMap(h => h.keywords)))}
               />
             </div>
             {/* 하단: 키워드 생성 버튼 */}

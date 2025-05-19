@@ -5,6 +5,8 @@ interface Props {
   keywords: string[];
   selected: string[];
   onToggle: (kw: string) => void;
+  primaryKeywords?: string[];
+  confirmedKeywords?: string[];
 }
 
 // 육각형 좌표 생성기
@@ -25,7 +27,7 @@ const generateHexCoords = (radius: number) => {
 const distanceFromCenter = (hex: { q: number; r: number; s: number }) =>
   Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(hex.s));
 
-const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
+const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle, primaryKeywords, confirmedKeywords }) => {
   const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
   // 키워드 수에 따라 동적으로 반지름 설정
   const radius = Math.ceil(Math.sqrt(keywords.length));
@@ -53,6 +55,8 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
             const kw = keywords[i];
             const isSelected = kw && selected.includes(kw);
             const isFirst = i === 0;
+            const isPrimary = primaryKeywords?.includes(kw);
+            const isConfirmed = confirmedKeywords?.includes(kw);
             return (
               <Hexagon
                 key={`${q},${r},${s}`}
@@ -64,10 +68,10 @@ const HexKeywordGrid: React.FC<Props> = ({ keywords, selected, onToggle }) => {
                 onMouseLeave={() => setHoveredIdx(null)}
                 style={{
                   fill: hoveredIdx === i ? '#ffce00' : isSelected ? '#F7DA21' : '#E5E7EB',
-                  stroke: isFirst ? '#ffce00' : 'none', // 첫 키워드만 노란색 테두리
-                  strokeWidth: isFirst ? 1 : 0,
+                  stroke: isPrimary || isConfirmed ? '#ffce00' : isFirst ? '#ffce00' : 'none',
+                  strokeWidth: isPrimary || isConfirmed ? 3 : isFirst ? 1 : 0,
                   cursor: kw ? 'pointer' : 'default',
-                  transition: 'fill 0.2s',
+                  transition: 'fill 0.2s, stroke 0.2s, stroke-width 0.2s',
                 }}
               >
                 {kw && (
