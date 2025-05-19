@@ -178,6 +178,10 @@ function ResultsPage() {
                 </button>
               </div>
             </div>
+            {/* 실제 검색에 사용된 키워드 시각화 */}
+            <div className="mb-2 text-sm text-gray-500">
+              <span className="font-semibold text-[#121212]">검색 키워드:</span> {query_list && query_list.length > 0 ? query_list.join(', ') : '없음'}
+            </div>
             {/* 중간: 헥사곤 키워드 그리드 */}
             <div className="flex-1 flex items-center justify-center">
               <HexKeywordGrid

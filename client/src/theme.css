@@ -1,7 +1,7 @@
 /* Spelling Bee (NYT) inspired color palette & typography */
 :root {
   /* Typography */
-  --font-family-main: 'Georgia', 'Times New Roman', Times, serif;
+  --font-family-main: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', Arial, sans-serif;
   --font-size-base: 18px;
   --font-size-lg: 22px;
   --font-size-xl: 28px;

@@ -29,17 +29,35 @@ def search():
             search_query = data.get('query', '').strip()
             if not search_query:
                 return jsonify({'error': '검색어를 입력해주세요.'}), 400
-            query_list = [search_query]
+            # 문장형 자연어 입력 시 핵심 키워드 추출
+            keywords = local_extract_keywords(search_query)
+            query_list = keywords if keywords else [search_query]
 
         processed_results = process_news(query_list, is_initial)
         print(f"\n=== 뉴스 검색 결과 ({len(processed_results['articles'])}건) ===")
-        return jsonify(processed_results)
+        # 항상 query_list를 응답에 포함
+        response = dict(processed_results)
+        response['query_list'] = query_list
+        # 검색 결과가 없으면 추천 키워드와 안내 메시지 추가
+        if not response.get('articles'):
+            response['recommend_keywords'] = query_list
+            response['alert'] = '문장형 검색어 대신 핵심 키워드 위주로 검색해 주세요.'
+        return jsonify(response)
     except Exception as e:
         print(f"❌ 처리 실패: {e}")
+        # 뉴스 검색 실패 시에도 안내 메시지와 추천 키워드 반환
+        if 'query_list' in locals():
+            return jsonify({
+                'articles': [],
+                'query_list': query_list,
+                'recommend_keywords': query_list,
+                'alert': '검색 결과가 없습니다. 문장형 검색어 대신 키워드 위주로 검색해 주세요.'
+            })
         return jsonify({'error': str(e)}), 500
 
 # === 키워드 추출 엔드포인트 추가 ===
-from gpt_processor import extract_keywords
+from gpt_processor import extract_keywords as gpt_extract_keywords
+from keyword_extractor import extract_keywords as local_extract_keywords
 
 @app.route('/keywords', methods=['POST'])
 @cross_origin()

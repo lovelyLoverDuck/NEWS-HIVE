@@ -23,10 +23,15 @@ function SearchPage() {
         body: JSON.stringify({ query: searchQuery }),
       });
       const data = await response.json();
+      // 검색 결과 없음 또는 서버에서 알림 메시지(alert) 전달 시 팝업 표시
+      if (data.alert) {
+        alert(`${data.alert}\n추천 키워드: ${data.recommend_keywords ? data.recommend_keywords.join(', ') : ''}`);
+        return; // 경고가 있으면 ResultPage로 이동하지 않음
+      }
       if (response.ok) {
         navigate('/results', {
           state: {
-            query_list: [searchQuery],
+            query_list: data.query_list || [searchQuery],
             is_initial: true,
             articles: data.articles,
             keywords: data.keywords,
@@ -44,79 +49,63 @@ function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7DA21] p-6">
-      {/* 상단 아이콘 */}
-      <div className="mb-6">
-        <FaForumbee className="w-28 h-28 text-[#6F4E37]" />
-      </div>
-
-      {/* 타이틀 */}
-      <h1 className="text-9xl font-bold mb-8 text-[#5D3A00]">
-        News Hive
-      </h1>
-
-      {/* 검색 폼 */}
-      <form 
-        onSubmit={handleSearch} 
-        className="flex items-center space-x-4 w-full max-w-2xl"
-      >
-        <input
-          type="text"
-          className={`border border-[#121212] p-3 rounded-md w-full text-[#121212] shadow-md placeholder-[#121212] focus:outline-none focus:ring-2 focus:ring-[#121212] bg-white transition duration-300 ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          placeholder="검색어를 입력하세요"
-          value={searchQuery}
-          onCompositionStart={() => setComposing(true)}
-          onCompositionEnd={e => {
-            setComposing(false);
-            let value = e.currentTarget.value;
-            const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
-            if (value !== replaced) {
-              setShowSpecialCharWarning(true);
-              setTimeout(() => setShowSpecialCharWarning(false), 2000);
-            }
-            setSearchQuery(replaced);
-          }}
-          onChange={e => {
-            if (composing) {
-              setSearchQuery(e.target.value);
-            } else {
-              let value = e.target.value;
-              const replaced = value.replace(/[^a-zA-Z0-9가-힣 ]/g, "");
+    <div className="min-h-screen flex items-center justify-center bg-[#FFF9D6] px-4 py-8">
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl flex flex-col items-center p-10">
+        <h1 className="text-5xl font-extrabold text-center mb-3 text-[#222] tracking-tight">뉴스 하이브</h1>
+        <p className="text-center text-lg text-[#888] mb-8">키워드를 따라가는 뉴스 탐색 여정</p>
+        <form onSubmit={handleSearch} className="flex items-center w-full bg-[#f8f8f8] rounded-xl px-4 py-3 gap-2 shadow-sm">
+          <input
+            type="text"
+            className="flex-1 border-0 outline-none bg-transparent text-lg py-2 px-2 placeholder-[#bbb]"
+            placeholder="검색어를 입력하세요"
+            value={searchQuery}
+            onCompositionStart={() => setComposing(true)}
+            onCompositionEnd={e => {
+              setComposing(false);
+              let value = e.currentTarget.value;
+              const replaced = value.replace(/[^a-zA-Z0-9\uac00-\ud7a3 ]/g, "");
               if (value !== replaced) {
                 setShowSpecialCharWarning(true);
                 setTimeout(() => setShowSpecialCharWarning(false), 2000);
               }
               setSearchQuery(replaced);
-            }
-          }}
-          onKeyDown={e => { if (e.key === 'Enter') handleSearch(e); }}
-          disabled={isLoading}
-          style={{ minWidth: 0 }}
-        />
+            }}
+            onChange={e => {
+              if (composing) {
+                setSearchQuery(e.target.value);
+              } else {
+                let value = e.target.value;
+                const replaced = value.replace(/[^a-zA-Z0-9\uac00-\ud7a3 ]/g, "");
+                if (value !== replaced) {
+                  setShowSpecialCharWarning(true);
+                  setTimeout(() => setShowSpecialCharWarning(false), 2000);
+                }
+                setSearchQuery(replaced);
+              }
+            }}
+            onKeyDown={e => { if (e.key === 'Enter') handleSearch(e); }}
+            disabled={isLoading}
+            style={{ minWidth: 0 }}
+          />
+          <button
+            type="submit"
+            className="bg-[#222] text-white rounded-xl p-3 flex items-center justify-center hover:bg-[#444] transition shadow"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" /></svg>
+            )}
+          </button>
+        </form>
         {showSpecialCharWarning && (
-          <div className="text-red-500 text-xs mt-1">특수문자는 입력할 수 없습니다.</div>
+          <div className="text-red-500 text-xs mt-2 text-center">특수문자는 입력할 수 없습니다.</div>
         )}
-        <button 
-          type="submit"
-          className="bg-[#121212] text-[#F8F8F8] font-semibold p-3 rounded-md hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 w-14 h-14 flex items-center justify-center"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <svg className="animate-spin w-6 h-6 text-[#F8F8F8]" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none"  
-              viewBox="0 0 24 24" strokeWidth="1.5" 
-              stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
-            </svg>
-          )}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

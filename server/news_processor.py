@@ -75,7 +75,7 @@ def process_news(query_list, is_initial=True, max_results=500):
 
     if not all_results:
         print("뉴스를 가져오기 실패")
-        exit()
+        raise RuntimeError("뉴스를 가져오기 실패")
 
     # ------ 함수 정의 ------
     def convert_pubdate(date_str):
