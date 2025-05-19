@@ -16,7 +16,10 @@ function ResultsPage() {
   const safeKeywords = Array.isArray(keywords) ? keywords : ['예시1', '예시2', '예시3'];
   const reorderedKeywords = [primaryQuery, ...safeKeywords.filter(k => k !== primaryQuery)];
 
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  // 최초 검색 시에는 query_list를 선택된 키워드로 자동 설정
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>(
+    is_initial && query_list.length > 0 ? [...query_list] : []
+  );
   const [resultArticles, setResultArticles] = useState<any[]>(safeArticles);
   const [resultKeywords, setResultKeywords] = useState<string[]>(reorderedKeywords);
   const [loading, setLoading] = useState(false);
@@ -113,32 +116,36 @@ function ResultsPage() {
         <div className="w-2/3 p-4 border-r overflow-auto" style={{ borderColor: '#E7E7E7' }}>
           <div className="flex flex-col gap-4 h-full">
             {/* 상단: 키워드 입력 & 홈버튼 영역 */}
-            <div className="flex items-center justify-between bg-[#f8f8f8] p-3 rounded shadow-sm mb-2">
-              <Link to="/" className="bg-[#121212] text-white p-2 rounded hover:opacity-80" title="처음으로">
-                <FaHome size={20} />
+            <div className="flex items-center justify-between bg-white/90 p-4 rounded-xl shadow-lg mb-4 border border-[#eee] backdrop-blur-sm">
+              <Link
+                to="/"
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-yellow-200 to-yellow-400 shadow hover:scale-105 hover:shadow-lg transition-all duration-200"
+                title="홈으로"
+              >
+                <FaHome size={28} className="text-[#121212]" />
               </Link>
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-3 items-center flex-1 ml-6">
                 <input
                   type="text"
                   value={inputKeyword}
                   onChange={e => setInputKeyword(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleAddKeyword(); }}
-                  placeholder="새로운 키워드 입력"
-                  className="border px-2 py-1 rounded w-40 focus:outline-none"
-                  style={{ borderColor: '#E7E7E7', backgroundColor: '#FFF', color: '#121212', fontSize: '13px' }}
-                  autoFocus
+                  placeholder="새 키워드를 입력하세요"
+                  className="flex-1 px-4 py-3 rounded-lg border border-[#E7E7E7] bg-[#fafafc] focus:ring-2 focus:ring-yellow-300 focus:border-yellow-400 transition-all text-base shadow-inner"
                   disabled={loading}
+                  style={{ minWidth: 0 }}
                 />
                 <button
                   onClick={handleAddKeyword}
                   disabled={!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading}
-                  className={`px-3 py-1 rounded font-semibold transition ${
-                    !inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
+                  className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all text-base shadow-md
+                    ${!inputKeyword.trim() || resultKeywords.includes(inputKeyword.trim()) || loading
                       ? 'bg-[#E7E7E7] text-[#AAAAAA] cursor-not-allowed'
-                      : 'bg-[#121212] text-white hover:opacity-90'
-                  }`}
+                      : 'bg-gradient-to-br from-yellow-300 to-yellow-400 text-[#121212] hover:brightness-105 hover:scale-105'
+                    }`}
                 >
-                  추가
+                  <span>추가</span>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                 </button>
               </div>
             </div>
