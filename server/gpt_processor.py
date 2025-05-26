@@ -64,11 +64,11 @@ def extract_keywords(news_data):
 
 
         if not candidate_set:
-
             return gpt_keywords[:3]
         filtered = [kw for kw in gpt_keywords if normalize(kw) not in candidate_set]
-
-        # 최대 3개까지만 반환
+        # 만약 필터링 후 결과가 비어있으면, gpt_keywords에서 최소 1개는 반환
+        if not filtered and gpt_keywords:
+            return gpt_keywords[:1]
         return filtered[:3]
         
     except json.JSONDecodeError as e:

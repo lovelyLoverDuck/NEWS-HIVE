@@ -12,10 +12,18 @@ from typing import List
 try:
     from konlpy.tag import Okt
     okt = Okt()
-    def extract_keywords(text: str, top_k: int = 5) -> List[str]:
-        # 명사만 추출 후, 길이 1 이상만 필터링
+    # 불용어 리스트 (OKT에서도 활용)
+    stopwords = set([
+        '어떻게', '왜', '뭐', '무엇', '누구', '언제', '어디',
+        '는', '가', '을', '를', '이', '에', '의', '도', '로', '으로', '에서', '부터', '까지',
+        '그리고', '그러나', '하지만', '그래서', '그러면', '그런데', '또한', '또', '및', '등', '등등'
+    ])
+    def extract_keywords(text: str, top_k: int = 10) -> List[str]:
+        # 명사만 추출 후, 길이 1 이상 & 불용어 제거
         nouns = okt.nouns(text)
-        keywords = [n for n in nouns if len(n) > 1]
+        keywords = [n for n in nouns if len(n) > 1 and n not in stopwords]
+        # 중복 제거 및 top_k개 반환
+        keywords = list(dict.fromkeys(keywords))
         return keywords[:top_k]
 except ImportError:
     import re
@@ -26,21 +34,20 @@ except ImportError:
         '에게', '한테', '밖에', '마다', '까지', '처럼', '보다', '하고', '및', '과', '와', '든지', '이나', '나', '라도', '조차', '마저', '만큼', '씩', '밖에', '뿐', '이나마', '이나마', '커녕', '조차', '까지도', '이라도', '이라곤', '이라면', '이지만', '인데', '이고', '이며', '이자', '이어서', '이든', '이라든', '이란', '이랑', '이래서', '이래도', '이랬다', '이랬던', '이랬으면', '이랬으니', '이랬으니까', '이랬을까', '이랬을텐데', '이랬을지', '이랬으리라', '이랬으리니', '이랬으리만큼', '이랬으리만치', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도', '이랬으리만은', '이랬으리만도', '이랬으리만큼은', '이랬으리만치도',
         '그리고', '그러나', '하지만', '그래서', '그러면', '그런데', '또한', '또', '및', '등', '등등'
     ])
-    def extract_keywords(text: str, top_k: int = 5) -> List[str]:
-        import re
+    def extract_keywords(text: str, top_k: int = 10) -> List[str]:
         # 한글/영문/숫자 단어 추출 (2글자 이상)
         candidates = re.findall(r'[가-힣]{2,}|[a-zA-Z0-9]{2,}', text)
-        print(f"[DEBUG] candidates: {candidates}")  # 디버깅용
-        # 조사/의문사/불용어/어미 모두 제거
-        particle_pattern = re.compile(r'^(.*?)(는|가|을|를|이|에|의|도|로|과|와|에서|까지|부터|처럼|보다|하고|이나|라도|조차|마저|만큼|씩|뿐|까지도|은|은가|은지|은데|은데도|은데요|은가요|은지요|은가요|은지요|은가요|은지요|은가요|은지요|은가요|은지요)$')
+        # 불용어/질문어 리스트
+        stopwords = set([
+            '어떻게', '왜', '뭐', '무엇', '누구', '언제', '어디',
+            '는', '가', '을', '를', '이', '에', '의', '도', '로', '으로', '에서', '부터', '까지',
+            '그리고', '그러나', '하지만', '그래서', '그러면', '그런데', '또한', '또', '및', '등', '등등'
+        ])
         question_words = set(['어떻게', '왜', '뭐', '무엇', '누구', '언제', '어디', '될까', '되나', '되니', '되냐', '되나요', '되었나', '되었나요', '궁금', '알려줘', '알고싶', '싶다', '싶어요', '싶니', '싶나요', '있나요', '있니', '있나'])
-        # 모든 후처리 없이 candidates를 합쳐서 복합명사로 반환
-        print(f"[DEBUG] candidates: {candidates}")  # 디버깅용
-        merged = ' '.join(candidates)
-        if merged:
-            return [merged]
-        else:
-            return []
+        # 후보 중 불용어/질문어 제거 및 중복 제거
+        filtered = [w for w in candidates if w not in stopwords and w not in question_words]
+        filtered = list(dict.fromkeys(filtered))
+        return filtered[:top_k]
 
 if __name__ == "__main__":
     # 테스트용
