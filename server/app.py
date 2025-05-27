@@ -3,7 +3,7 @@ from flask_cors import CORS, cross_origin
 from news_processor import process_news
 from gpt_processor import summarize_articles
 from gpt_processor import generate_final_report
-
+from gpt_processor import extract_keywords
 
 
 app = Flask(__name__)
