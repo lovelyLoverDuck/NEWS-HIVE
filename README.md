@@ -1,4 +1,7 @@
-# 네이버 뉴스 검색 프로젝트
+<img width="4678" height="6622" alt="test" src="https://github.com/user-attachments/assets/463ec24a-0a5f-4346-b90a-573cabfbebcd" />
+
+
+#네이버 뉴스 검색 프로젝트
 
 이 프로젝트는 네이버 뉴스 검색 API를 활용한 웹 애플리케이션입니다.
 
